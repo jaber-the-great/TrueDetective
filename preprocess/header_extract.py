@@ -10,7 +10,7 @@ def convert_int_to_byte(value,number_of_bytes):
 
     res = value.to_bytes(number_of_bytes,'big')
     return res
-def handshake_extract(input_pcap, output_dir):
+def HeaderExtract(input_pcap, output_dir):
     """
 
     Args:
@@ -27,7 +27,7 @@ def handshake_extract(input_pcap, output_dir):
     flow =rdpcap(input_pcap)
     ipHeaders = []
     transportHeaders = []
-
+    counter = 0
     for pkt in flow:
         if pkt.haslayer("TCP"):
             transportHeader = list(bytes(pkt["TCP"]))[:20]
@@ -42,8 +42,39 @@ def handshake_extract(input_pcap, output_dir):
         transportHeader.extend([0] * (20 - len(transportHeader)))
         ipHeaders.append(ipHeader)
         transportHeaders.append(transportHeader)
+        counter+=1
+        if counter > 0:
+            break
+
 
     save_data(ipHeaders, transportHeaders,output_dir)
+
+
+def SeveralHeaderExtract(input_pcap, output_dir, numOfPackets):
+
+    # Reading the pcap file
+    flow =rdpcap(input_pcap)
+    ipHeaders = []
+    transportHeaders = []
+    counter = 0
+    for pkt in flow:
+        if pkt.haslayer("TCP"):
+            transportHeader = list(bytes(pkt["TCP"]))[:20]
+
+        elif pkt.haslayer("UDP"):
+            transportHeader = list(bytes(pkt["UDP"]))[:8]
+        else:
+            continue
+        ipHeader = list(bytes(pkt["IP"]))[:20]
+        # Padding with zero to match the number of bytes required
+        ipHeader.extend([0] * (20 - len(ipHeader)))
+        transportHeader.extend([0] * (20 - len(transportHeader)))
+        ipHeaders.append(ipHeader)
+        transportHeaders.append(transportHeader)
+        counter+=1
+        if counter == numOfPackets:
+            save_data(ipHeaders, transportHeaders, output_dir)
+            return
 def save_data(ipHeaders, transportHeaders, output_loc ):
 
 
@@ -56,21 +87,22 @@ def save_data(ipHeaders, transportHeaders, output_loc ):
 
     result = pd.DataFrame(result).T
     result.to_csv(output_loc,mode = 'w',index=False, header=False)
-def feed_packets(input_dir, output_dir):
+def feed_packets(input_dir, output_dir, numOfPackets):
     arg_list = []
     for subdir, dirs, files in os.walk(input_dir):
         print(subdir)
         for file in files:
             if file.endswith(".pcap"):
                 newName = file.split('.')[0] + ".csv"
-                lst = ( input_dir + '/' + file, output_dir + '/' + newName)
+                lst = ( input_dir + '/' + file, output_dir + '/' + newName, numOfPackets)
                 arg_list.append(lst)
+
                 # determine_handshake(subdir + '/' + file, "alaki")
 
-                # handshake_extract(subdir+'/' + file , output_dir+ '/' + section + '/' + newName, NumOfBytes)
+                # HeaderExtract(subdir+'/' + file , output_dir+ '/' + section + '/' + newName, NumOfBytes)
     # # Parallel processing of all pcap files and converting them to csv
     # print(arg_list)
-    _paralell_process(handshake_extract, arg_list)
+    _paralell_process(SeveralHeaderExtract, arg_list)
 def _paralell_process(func, input_args, cores=0):
     if cores == 0:
         cores = os.cpu_count()
@@ -90,8 +122,9 @@ def byte_extract_tls(packet, NumberOfBytes):
         data = list( bytes(tls)[:NumberOfBytes])
     return data
 if __name__=="__main__":
-    numberOfBytesToExtract = 12
-    inputFiles = "/home/jaber/TrueDetective/pcaps"
+    # numberOfBytesToExtract = 12
+    PacketsPerflow = 3
+    inputFiles = "/home/jaber/TrueDetective/pcaps/"
     outputDirectory = "/home/jaber/TrueDetective/headers"
-    feed_packets(inputFiles,outputDirectory)
-    handshake_extract("/home/jaber/TrueDetective/pcaps/smaller60-3019.pcap","/home/jaber/TrueDetective/test.csv" )
+    feed_packets(inputFiles,outputDirectory, PacketsPerflow)
+#     HeaderExtract("/home/jaber/TrueDetective/pcaps/file-0001.pcap","/home/jaber/TrueDetective/test.csv" )
