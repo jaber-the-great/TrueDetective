@@ -76,7 +76,6 @@ def readAndEditFlow(inputFile, outputFile):
         # subprocess.getoutput(f"rm {inputFile}")
 
 
-
 if __name__ == "__main__":
     warnings.simplefilter(action='ignore', category=(SettingWithCopyWarning))
 
