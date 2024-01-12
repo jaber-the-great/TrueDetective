@@ -1,16 +1,11 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import os
+import subprocess
+
 import pandas as pd
 from multiprocessing import Pool
 import csv
+from subprocess import call
 
-
-# In[2]:
 
 
 def changeFlowID(filename):
@@ -21,24 +16,20 @@ def changeFlowID(filename):
     df.to_csv(filename, index=False)
 
 
-# In[3]:
 
-
-def mergeCICs(input_dir):
+def mergeCICs(input_dir, output_dir):
     filesList = []
     for subdir, dirs, files in os.walk(input_dir):
         for file in files:
             if file.endswith(".csv"):
                 filesList.append(subdir + "/" + file)
                 changeFlowID(subdir + "/" + file)
-                print(file)
+                #print(file)
+
     if filesList != []:
         df = pd.concat(map(pd.read_csv, filesList), ignore_index=True)
-        print("here")
-        df.to_csv("CIC_Merged.csv", index=False)
-
-
-# In[4]:
+        subprocess.getoutput(f'mkdir {output_dir}')
+        df.to_csv( output_dir+ "CIC_Merged.csv", index=False)
 
 
 def appendCICandheaders(meregedCIC, headersDir,  outputDir , numOfHeaderBytes ):
@@ -64,27 +55,13 @@ def appendCICandheaders(meregedCIC, headersDir,  outputDir , numOfHeaderBytes ):
     
 
 
-# In[ ]:
-
-
-
-
-
-# In[10]:
-
-
-def feed_packets(input_dir, output_dir):
+def feed_packets_appendCICandheaders(header_dir, cic_dir ,output_dir,numOfHeaderBytes):
     arg_list = []
-    for subdir, dirs, files in os.walk(input_dir):
-        print(subdir)
-        for file in files:
-            if file.endswith(".pcap"):
-                newName = file.split('.')[0] + ".csv"
-                lst = ( input_dir + '/' + file, output_dir + '/' + newName)
-                arg_list.append(lst)
+
+    lst = ( input_dir + '/' + file, output_dir + '/' + newName)
+    arg_list.append(lst)
 
 
-# In[8]:
 
 
 def _paralell_process(func, input_args, cores=0):
@@ -95,16 +72,19 @@ def _paralell_process(func, input_args, cores=0):
     
 
 
-# In[22]:
-
-
 if __name__ == "__main__":
     #mergeCICs("/home/jaber/TrueDetective/cic")
-    appendCICandheaders("CIC_Merged.csv", "/home/jaber/TrueDetective/3packetHeaders/" ,"/home/jaber/TrueDetective/cicMerge3Packet/",  120)
+    #appendCICandheaders("CIC_Merged.csv", "/home/jaber/TrueDetective/3packetHeaders/" ,"/home/jaber/TrueDetective/cicMerge3Packet/",  120)
 
 
+    for i in range(1,746):
+        print(i)
+        # Mefging the edited cics of each subfolder
+        # mergeCICs("/home/jaber/TrueDetective/editedCICFilteredPcaps/" + str(i) + "/" , "/home/jaber/TrueDetective/mergedCIC/"+ str(i) + "/" )
 
-# In[ ]:
+        # Creating subdirectories before saving the output
+        # subprocess.getoutput(f'mkdir /home/jaber/TrueDetective/HeaderCIC/{str(i)}/')
+
 
 
 
