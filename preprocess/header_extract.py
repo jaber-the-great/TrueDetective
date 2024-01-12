@@ -5,24 +5,12 @@ import pandas as pd
 from multiprocessing import Pool
 from scapy.main import load_layer
 # from torch.multiprocessing.pool import Pool
-
+import subprocess
 def convert_int_to_byte(value,number_of_bytes):
 
     res = value.to_bytes(number_of_bytes,'big')
     return res
 def HeaderExtract(input_pcap, output_dir):
-    """
-
-    Args:
-        input_pcap: The pcap file for each flow
-        output_dir: The location in which you desire to store the result
-
-    Returns: Nothing
-    Get the first n bytes of p client hello message sand q server hello messages
-    in a flow. Store the result in a csv file. each byte of these n bytes are converted
-    to an integer and would be a column in .csv file
-
-    """
     # Reading the pcap file
     flow =rdpcap(input_pcap)
     ipHeaders = []
@@ -87,14 +75,17 @@ def save_data(ipHeaders, transportHeaders, output_loc ):
 
     result = pd.DataFrame(result).T
     result.to_csv(output_loc,mode = 'w',index=False, header=False)
+
+
 def feed_packets(input_dir, output_dir, numOfPackets):
     arg_list = []
     for subdir, dirs, files in os.walk(input_dir):
-        print(subdir)
         for file in files:
             if file.endswith(".pcap"):
                 newName = file.split('.')[0] + ".csv"
-                lst = ( input_dir + '/' + file, output_dir + '/' + newName, numOfPackets)
+
+                outputSubdir = subdir.split('/')[-1]
+                lst = ( input_dir + '/' + file, output_dir +  '/' + outputSubdir +'/' + newName, numOfPackets)
                 arg_list.append(lst)
 
                 # determine_handshake(subdir + '/' + file, "alaki")
@@ -124,7 +115,10 @@ def byte_extract_tls(packet, NumberOfBytes):
 if __name__=="__main__":
     # numberOfBytesToExtract = 12
     PacketsPerflow = 3
-    inputFiles = "/home/jaber/TrueDetective/pcaps/"
+    inputFiles = "/home/jaber/TrueDetective/filteredPcaps/"
     outputDirectory = "/home/jaber/TrueDetective/headers"
-    feed_packets(inputFiles,outputDirectory, PacketsPerflow)
+    for i in range(1,746):
+        print(i)
+        feed_packets(inputFiles + str(i),outputDirectory, PacketsPerflow)
 #     HeaderExtract("/home/jaber/TrueDetective/pcaps/file-0001.pcap","/home/jaber/TrueDetective/test.csv" )
+
