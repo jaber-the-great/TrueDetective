@@ -36,48 +36,55 @@ def userFlowStats(userFlows):
 def combineSameUserFlows(userFlows):
     combinedList = {}
     userList = list(userFlows.keys())
+    weightList= [len(value) for value in userFlows.values()]
     cnt = 0
     # Skip the users with less than 6 and more than 300 flows
     # Then creating the same amount of combination with other users which are randomly chose
     # IMPORTANT: Be careful about the location of the files (it is before batching them together but not need to change it at this stage)
     for user, flows in userFlows.items():
-        if len(flows) < 2:
-            continue
+        cnt+=1
+        print(cnt)
+        try:
+            if len(flows) < 2:
+                continue
 
-        if len(flows) <= 200:
-            selected_flows = flows
-        else:
-            selected_flows = random.sample(flows, 200)
-        pairs = list(combinations(selected_flows, 2))
-        # Labeling pairs as 1
-        pairs = [(p[0], p[1], 1) for p in pairs]
-        #print(pairs)
+            if len(flows) <= 150:
+                selected_flows = flows
+            else:
+                selected_flows = random.sample(flows, 150)
+            pairs = list(combinations(selected_flows, 2))
+            # Labeling pairs as 1
+            pairs = [(p[0], p[1], 1) for p in pairs]
+            #print(pairs)
 
-        # We use length of pairs because we want to have the same amount of records with 0 label
-        for i in range(len(pairs)):
-            otherUser = random.choice(userList)
-            # Making shure about incorrect possible incorrect labelling
-            while otherUser == user :
-                otherUser = random.choice(userList)
-            newPair = (random.choice(selected_flows), random.choice(userFlows[otherUser]), 0)
-            pairs.append(newPair)
-        combinedList[user] = pairs
+            # We use length of pairs because we want to have the same amount of records with 0 label
+            for i in range(len(pairs)):
+                ## Random choise based on the weight of each user, the weight is number of flows associated with each user
+                otherUser = random.choices(userList, weights=weightList, k=1 )[0]
+                # Making shure about incorrect possible incorrect labelling
+                while otherUser == user :
+                    otherUser = random.choice(userList)
+                newPair = (random.choice(selected_flows), random.choice(userFlows[otherUser]), 0)
+                pairs.append(newPair)
+            combinedList[user] = pairs
+        except:
+            print(f'error for user {user}')
 
 
 
-    with open("CombinedPairs6Flows.json", "w") as jsonfile:
+    with open("Combine150Flows.json", "w") as jsonfile:
         json.dump(combinedList,jsonfile)
 
 def createDatasetFromFlows(flowPairs):
-    # TODO: create the panda dataframe
+
     # Read csv files and add it to the dataframe
     flag = True
     cnt = 0
+    dataset = []
+    cols = []
     for user, pairs in flowPairs.items():
         cnt +=1
         print(cnt)
-        if cnt % 1000 == 0:
-            dataset.to_pickle(f'{cnt}.pkl')
 
         try:
             for pair in pairs:
@@ -85,21 +92,21 @@ def createDatasetFromFlows(flowPairs):
                 firstFlow = pd.read_csv(pair[0])
                 secFlow = pd.read_csv(pair[1])
                 label = pair[2]
-                if flag:
-                    flag = False
-                    dataset = pd.concat([firstFlow, secFlow], axis =1)
-                    dataset['Label'] = label
-                else:
-                    joined = pd.concat([firstFlow, secFlow], axis =1)
-                    joined['Label'] = label
-                    # list of pds and append f
-                   # dataset = pd.concat([dataset, joined] , ignore_index=True)
+                joined = firstFlow.values.tolist()[0]
+                joined.extend(secFlow.values.tolist()[0])
+                joined.append(label)
+                dataset.append(joined)
+                if not cols:
+                    cols = list(firstFlow.columns)
+                    cols.extend(list(secFlow.columns))
+                    cols.append('label')
 
         except:
             print(user)
             #print(pairs)
-
-    dataset.to_pickle("dataset.pkl")
+        break
+    df = pd.DataFrame(dataset,columns=cols)
+    df.to_pickle("dataset.pkl")
 
 
 
@@ -108,10 +115,10 @@ def createDatasetFromFlows(flowPairs):
 if __name__ == "__main__":
     file = open("groupings.json")
     userFlows = json.load(file)
-    # userFlowStats(userFlows)
+    userFlowStats(userFlows)
     # combineSameUserFlows(userFlows)
-    #file = open("CombinedPairs6Flows.json")
-    #flowPairs = json.load(file)
-    #createDatasetFromFlows(flowPairs)
+    # file = open("CombinedPairs6Flows.json")
+    # flowPairs = json.load(file)
+    # createDatasetFromFlows(flowPairs)
 
 
