@@ -4,8 +4,20 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn import datasets
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from trustee import ClassificationTrustee
 from numba import jit, cuda
 import torch
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 # use_cuda = torch.cuda.is_available()
 # device = torch.device("cuda" if use_cuda else "cpu")
 # print("Device: ",device)
@@ -27,10 +39,10 @@ def renameColumns(numberOfPackets):
                 columnsToRename[name] = TCPHeaderList[i]
         # print(columnsToRename)
         return columnsToRename
-df1 = pd.read_pickle('/home/jaber/TrueDetective/dataset/90.pkl')
-df2 = pd.read_pickle('/home/jaber/TrueDetective/dataset/91.pkl')
-df3 = pd.read_pickle('/home/jaber/TrueDetective/dataset/92.pkl')
-dataset = pd.concat([df1,df2,df3])
+# df1 = pd.read_pickle('/home/jaber/TrueDetective/dataset/90.pkl')
+# df2 = pd.read_pickle('/home/jaber/TrueDetective/dataset/91.pkl')
+# df3 = pd.read_pickle('/home/jaber/TrueDetective/dataset/92.pkl')
+# dataset = pd.concat([df1,df2,df3])
 dataset = pd.read_pickle('/home/jaber/TrueDetective/dataset/90.pkl')
 columnsToRename = renameColumns(3)
 dataset.rename(columns=columnsToRename, inplace=True)
@@ -51,50 +63,59 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import SVC
+print("Feature scaling done")
+clf = RandomForestClassifier(n_estimators=100)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
 
-models = []
-print("Decision Tree")
-DT= DecisionTreeClassifier(criterion = 'entropy', random_state = 0)
-models.append(DT)
-# 91.5
+print("Classification done")
+
+trustee = ClassificationTrustee(expert=clf)
+trustee.fit(X_train, y_train, num_iter=50, num_stability_iter=10, samples_size=0.3, verbose=True)
+dt, pruned_dt, agreement, reward = trustee.explain()
+dt_y_pred = dt.predict(X_test)
+
+print("Model explanation global fidelity report:")
+print(classification_report(y_pred, dt_y_pred))
+print("Model explanation score report:")
+print(classification_report(y_test, dt_y_pred))
+
+#
+# models = []
+# print("Decision Tree")
+# DT= DecisionTreeClassifier(criterion = 'entropy', random_state = 0)
+# models.append(DT)
+# # 91.5
 #
 # print("K Nearest Neighbor")
 # KNN = KNeighborsClassifier(n_neighbors = 5, metric = 'minkowski', p = 2)
 # models.append(KNN)
-# 78
-
-# print("Kernel SVM")
-# Support = SVC(kernel = 'rbf', random_state = 0)
-# models.append(Support)
-# # 80
+# #78
+#
+# # print("Kernel SVM")
+# # Support = SVC(kernel = 'rbf', random_state = 0)
+# # models.append(Support)
+# # # 80
 # print("Logistic Regression")
 # LR = LogisticRegression(random_state = 0, max_iter=10000)
 # models.append(LR)
-# LR.fit(X_train, y_train)
-#
 # # 59
 #
-print("Naive Bayes")
-NB = GaussianNB()
-models.append(NB)
-# # 51.4
-
+# print("Naive Bayes")
+# NB = GaussianNB()
+# models.append(NB)
+# # # 51.4
+#
+models = []
 print("Random Forest")
 RF = RandomForestClassifier(n_estimators = 10, criterion = 'entropy', random_state = 0)
 models.append(RF)
 # # 96.6
+# #
+# # print("SVM")
+# # svm = SVC(kernel = 'linear', random_state = 0)
+# # models.append(svm)
 #
-# print("SVM")
-# svm = SVC(kernel = 'linear', random_state = 0)
-# models.append(svm)
-
 
 for item in models:
     print(item)
@@ -103,4 +124,5 @@ for item in models:
     # cm = confusion_matrix(y_test, y_pred)
     # print(cm)
     print(accuracy_score(y_test, y_pred))
+
 
