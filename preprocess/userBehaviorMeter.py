@@ -3,27 +3,20 @@ import pandas as pd
 from multiprocessing import Pool
 import os
 import datetime
+import json
 
 
-#TODO: Open all cic files in each direcotry, put them in a dictionary,
-#TODO: import and use python stat and collections modules for getting the stats 
-
-input = ['/mnt/md0/jaber/groupedcicflow/169.231.141.110/s2f3_00000_20221205201500-45086.pcap_Flow.csv',
-         '/mnt/md0/jaber/groupedcicflow/169.231.141.110/s3f0_00000_20221205201500-51228.pcap_Flow.csv',
-          '/mnt/md0/jaber/groupedcicflow/169.231.141.110/s3f2_00000_20221205201500-24138.pcap_Flow.csv' , 
-           '/mnt/md0/jaber/groupedcicflow/169.231.141.110/s3f3_00000_20221205201500-41813.pcap_Flow.csv']
-
+# input = ['/mnt/md0/jaber/groupedcicflow/169.231.141.110/s2f3_00000_20221205201500-45086.pcap_Flow.csv',
+#          '/mnt/md0/jaber/groupedcicflow/169.231.141.110/s3f0_00000_20221205201500-51228.pcap_Flow.csv',
+#           '/mnt/md0/jaber/groupedcicflow/169.231.141.110/s3f2_00000_20221205201500-24138.pcap_Flow.csv' , 
+#            '/mnt/md0/jaber/groupedcicflow/169.231.141.110/s3f3_00000_20221205201500-41813.pcap_Flow.csv']
 
 
 
 
-def flowStat(userFlows):
-    flows = []
+def flowStat(userFlows, outputDir,captureStartTime, captureDuration):
     windowStat = {}
-    for item in userFlows:
-        flows.append( pd.read_csv(item))
-    userFlows = pd.concat(flows)
-    print(userFlows)
+    
     
     # Flow Duration
     windowStat['TotalFlowDuration'] = userFlows['Flow Duration'].sum()
@@ -63,7 +56,6 @@ def flowStat(userFlows):
     windowStat['distinctDstPorts'] = userFlows['Dst Port'].nunique()
 
     # Flows distinct dst IP
-    # TODO: May need to change this to Outside IP
     windowStat['distinctDstIP'] = userFlows['Outside IP'].nunique()
 
     # Total number of flows
@@ -87,17 +79,49 @@ def flowStat(userFlows):
     windowStat['stdDownUpRatio'] = userFlows['Down/Up Ratio'].std() 
 
     # Inte arrival time of flows
-    # TODO: Sort the flows based on the timestamp, then calculate the inter arrival time
-    # Convert timestamp to datetime object
-    userFlows['Timestamp'] = pd.to_datetime(userFlows['Timestamp'], format='%m/%d/%Y %I:%M:%S %p')
 
+    intervals = flowInterArrivalTime(userFlows)
+    windowStat['minFlowIAT'] = intervals.min()
+    windowStat['maxFlowIAT'] = intervals.max()
+    windowStat['avgFlowIAT'] = intervals.mean()
+    windowStat['stdFlowIAT'] = intervals.std()
+
+    
+    # Calculate the stats of the idle times
+    idleTimes = flowIdleTime(userFlows['Timestamp'], userFlows['Flow Duration'], captureStartTime, captureDuration)
+    windowStat['minIdleTime'] = min(idleTimes)  
+    windowStat['maxIdleTime'] = max(idleTimes)  
+    windowStat['totalIdleTime'] = sum(idleTimes)
+    windowStat['stdIleTime'] = idleTimes.std()
+    windowStat['avgIdleTime'] = idleTimes.mean()  
+
+    # Ratio of number of TCP flows to number of UDP flows
+    windowStat['totalTCPFlows'] = userFlows[userFlows['Protocol'] == 6]['Protocol'].count()
+    windowStat['totalUDPFlows'] = userFlows[userFlows['Protocol'] == 17]['Protocol'].count()
+
+    # It resulted in a division by zero error
+    # windowStat['TCPUDPFlowsRatio'] = windowStat['totalTCPFlows'] / windowStat['totalUDPFlows']
+
+    # Saving to file
+    IP = userFlows['User IP'].iloc[0]
+    outFileName = f'{outputDir}{IP}.csv'
+    #print(outFileName)
+    df = pd.DataFrame(windowStat , index=[0])
+    df.to_csv(outFileName, index=False)
+
+
+
+
+
+def flowInterArrivalTime(userFlows):
+    userFlows['Timestamp'] = pd.to_datetime(userFlows['Timestamp'], format='%m/%d/%Y %I:%M:%S %p')
     # Sort flows based on timestamp
     userFlows = userFlows.sort_values(by='Timestamp')
-    print(windowStat)
+
     # Calculate time intervals between flows
     intervals = []
     timestamps = userFlows['Timestamp'].tolist()
-
+    
     if len(timestamps) >1:
         for i in range(len(timestamps) - 1):
             interval = timestamps[i+1] - timestamps[i]
@@ -107,61 +131,16 @@ def flowStat(userFlows):
     
     # Calculate the stats of the intervals
     intervals = pd.Series(intervals)
-    windowStat['minFlowIAT'] = intervals.min()
-    windowStat['maxFlowIAT'] = intervals.max()
-    windowStat['avgFlowIAT'] = intervals.mean()
-    windowStat['stdFlowIAT'] = intervals.std()
+    return intervals
 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # Flow Packets
-
-    # windowStat['totalPackets'] = windowStat['totalBwdBytes'] + windowStat['totalFwdBytes']  
-    # windowStat['minPacketLen'] = userFlows['min_packet_length'].min()
-    # windowStat['maxPacketLen'] = userFlows['max_packet_length'].max()
-    # windowStat['avgPacketLen'] = userFlows['mean_packet_length'].mean()
-    # windowStat['stdPacketLen'] = userFlows['mean_packet_length'].std()
-    # windowStat['minIAT'] = userFlows['min_inter_arrival_time'].min()
-
-    # # Inter Arrival Time
-    # windowStat['maxIAT'] = userFlows['max_inter_arrival_time'].max()
-    # windowStat['avgIAT'] = userFlows['mean_inter_arrival_time'].mean()
-    # windowStat['stdIAT'] = userFlows['mean_inter_arrival_time'].std()
-
-    # windowStat['minFwdIAT'] = userFlows['min_forward_inter_arrival_time'].min()
-    # windowStat['maxFwdIAT'] = userFlows['max_forward_inter_arrival_time'].max()
-    # windowStat['avgFwdIAT'] = userFlows['mean_forward_inter_arrival_time'].mean()
-    # windowStat['stdFwdIAT'] = userFlows['mean_forward_inter_arrival_time'].std()
-
-
-    # # flow idle time
-    # windowStat['minIdleTime'] = userFlows['min_flow_idle_time'].min()
-    # windowStat['maxIdleTime'] = userFlows['max_flow_idle_time'].max()
-    # windowStat['avgIdleTime'] = userFlows['mean_flow_idle_time'].mean()
-    # windowStat['stdIdleTime'] = userFlows['mean_flow_idle_time'].std()
-    # i\
-    # # flow active time
-    # windowStat['minActiveTime'] = userFlows['min_flow_active_time'].min()
-
-
-
-def flowIdleTime():
+def flowIdleTime(Start, Duration, captureTime, CaptureDuration ):
     # TODO: Edit this function and make it faster
     # Sample data: start times and durations of tasks
-    data = {'Start': ['01:01:2022 00:00:15', '01:01:2022 00:00:30', '01:01:2022 00:00:10'],
-            'Duration': ['00:00:10', '00:00:15', '00:00:05']}
+    
+    data = {
+        'Start': Start,
+        'Duration': Duration
+    }
 
     df = pd.DataFrame(data)
 
@@ -176,7 +155,11 @@ def flowIdleTime():
     df = df.sort_values(by='Start')
 
     # Iterate through the sorted DataFrame to find free time brackets
-    previous_end = pd.to_datetime('01:01:2022 00:00:00')
+    previous_end = pd.to_datetime(captureTime)
+
+    captureTime = pd.to_datetime(captureTime)
+    capDuration = pd.to_timedelta(captureDuration, unit='s')
+    endTime = captureTime + capDuration
 
     for _, row in df.iterrows():
         start_time = row['Start']
@@ -190,16 +173,46 @@ def flowIdleTime():
         previous_end = max(previous_end, end_time)
 
     # Check if there is free time after the last task
-    if previous_end < pd.to_datetime('01:01:2022 00:01:00'):
-        free_time_brackets.append((previous_end, pd.to_datetime('01:01:2022 00:01:00')))
+   
+    if previous_end < endTime:
+        free_time_brackets.append((previous_end, endTime))
 
     # Display the result
-    print("Time brackets with no tasks:")
-    for start, end in free_time_brackets:
-        print(f"{start.strftime('%m:%d:%Y %H:%M:%S')} - {end.strftime('%m:%d:%Y %H:%M:%S')}")
+    # print("Time brackets with no tasks:")
+    # for start, end in free_time_brackets:
+    #     print(f"{start.strftime('%m:%d:%Y %H:%M:%S')} - {end.strftime('%m:%d:%Y %H:%M:%S')}")
+    
+    idle = []
+    for i in range(len(free_time_brackets)):
+        interval = free_time_brackets[i][1] - free_time_brackets[i][0]
+        idle.append(interval.total_seconds())
+    idle = pd.Series(idle)
+    return idle
 
+if __name__ == '__main__':
 
+    
+    captureStartTime = "05/12/2022 08:15:00 PM"
+    captureStartTime= pd.to_datetime(captureStartTime)
+    captureDuration = 60
+    # read all files in the directory and put them in a list
+    inputDir = "/mnt/md0/jaber/groupedcicflow/"
+    outputDir = "/mnt/md0/jaber/windowStat/"
+    cnt = 0
+    for root, dirs, files in os.walk(inputDir):
+        userFlows = []
+        for file in files:
+            if file.endswith(".csv"):
+                data = pd.read_csv(os.path.join(root, file))
+                userFlows.append(data)
+                pass
+        print(root)
+        cnt+=1
+        print(cnt)
+        if userFlows != []:
+            userFlows = pd.concat(userFlows)
+            flowStat(userFlows, outputDir ,captureStartTime, captureDuration)
+            
 
+#flowStat(userFlows, outputDir ,captureStartTime, captureDuration)
 
-# flowStat(input)
-flowIdleTime()
