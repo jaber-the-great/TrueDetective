@@ -57,22 +57,24 @@ def readAndEditFlow(inputFile, outputFile):
         # if src is internal ip, the direction is 1, otherwise the direction is zero
         direction = 0
         if checkInternalIP(srcIP):
-            srcHash = short_hash_ip(srcIP)
+            srcHash = srcIP
             outsideIP = dstIP
             direction = 1
         else:
-            srcHash = short_hash_ip(dstIP)
+            srcHash = dstIP
             outsideIP = srcIP
             direction = 0
         del flow['Src IP']
         del flow['Dst IP']
         flow['Direction'] = direction
         flow['Outside IP'] = outsideIP
-        flow['User Label'] = srcHash
-
+        flow['User IP'] = srcHash
+        
+        fileName = inputFile.split('/')[-1]
+        flow['Flow ID'] = fileName
         flow.to_csv(outputFile,index=False)
     except:
-        print(inputFile)
+        print(inputFile) 
         # subprocess.getoutput(f"rm {inputFile}")
 
 
@@ -80,7 +82,7 @@ if __name__ == "__main__":
     warnings.simplefilter(action='ignore', category=(SettingWithCopyWarning))
 
     # readAndEditFlow("/home/jaber/TrueDetective/cicFilteredPcaps/1/s3-2022-04-29-1215-ens4f1-2022-04-29-1215-365895.pcap_Flow.csv" ,"/home/jaber/TrueDetective/editedCICFilteredPcaps/1")
-    for i in range(1,746):
+    for i in range(1,112):
         print(i)
-        feed_packets("/home/jaber/TrueDetective/cicFilteredPcaps/"+ str(i) , "/home/jaber/TrueDetective/editedCICFilteredPcaps"+ "/" + str(i))
-        #subprocess.getoutput(f'mkdir /home/jaber/TrueDetective/editedCICFilteredPcaps/{str(i)}')
+        feed_packets("/mnt/md0/jaber/cicflow/"+ str(i) , "/mnt/md0/jaber/editedcicflow/"+ "/" + str(i))
+        #subprocess.getoutput(f'mkdir /mnt/md0/jaber/editedcicflow/{str(i)}')
