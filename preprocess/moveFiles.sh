@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Source directory
-source_dir="/home/jaber/TrueDetective/toomany"
+source_dir="/mnt/md0/jaber/oneminSplit/s3f3"
 
 # Base destination directory
-base_destination="/home/jaber/TrueDetective/toomany1/"
+base_destination="/mnt/md0/jaber/cic/temp/"
 
 # Ensure the source directory exists
 if [ ! -d "$source_dir" ]; then
@@ -13,7 +13,7 @@ if [ ! -d "$source_dir" ]; then
 fi
 
 # Loop to move files until the source directory is empty
-counter=1
+counter=99
 while [ "$(ls -A "$source_dir")" ]; do
     # Destination directory for this iteration
     destination_dir="${base_destination}${counter}/"
@@ -22,7 +22,7 @@ while [ "$(ls -A "$source_dir")" ]; do
     mkdir -p "$destination_dir"
 
     # Move the first 5000 files from the source directory to the destination directory
-    find "$source_dir" -maxdepth 1 -type f | head -n 1000 | xargs -I {} mv {} "$destination_dir"
+    find "$source_dir" -maxdepth 1 -type f | head -n 5000 | xargs -I {} mv {} "$destination_dir"
 
     # Increment counter for the next iteration
     ((counter++))

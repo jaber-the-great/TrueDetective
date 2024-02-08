@@ -8,9 +8,8 @@ from sklearn import datasets
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
-from trustee import ClassificationTrustee
-from numba import jit, cuda
-import torch
+
+
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
@@ -43,13 +42,13 @@ def renameColumns(numberOfPackets):
 # df2 = pd.read_pickle('/home/jaber/TrueDetective/dataset/91.pkl')
 # df3 = pd.read_pickle('/home/jaber/TrueDetective/dataset/92.pkl')
 # dataset = pd.concat([df1,df2,df3])
-dataset = pd.read_pickle('/home/jaber/TrueDetective/dataset/90.pkl')
+dataset = pd.read_pickle('/mnt/md0/jaber/dataset/1.pkl')
 columnsToRename = renameColumns(3)
 dataset.rename(columns=columnsToRename, inplace=True)
 
 
 # TODO: Drop irrelevant columns, maybe change some of them instead of dropping
-columnsToDrop = ['Flow ID', 'Timestamp', 'User Label', 'Label','Outside IP','L2Checksum1','L2Checksum2', 'SrcIP1','SrcIP2','SrcIP3','SrcIP4','DstIP1','DstIP2','DstIP3','DstIP4','L3Checksum1','L3Checksum2']
+columnsToDrop = ['Flow ID', 'Timestamp', 'label', 'Label','Outside IP','L2Checksum1','L2Checksum2', 'SrcIP1','SrcIP2','SrcIP3','SrcIP4','DstIP1','DstIP2','DstIP3','DstIP4','L3Checksum1','L3Checksum2']
 dataset.drop(columns=columnsToDrop, inplace= True)
 X = dataset.iloc[:, :-1].values
 y = dataset.iloc[:, -1].values
@@ -63,22 +62,22 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.transform(X_test)
 
-print("Feature scaling done")
-clf = RandomForestClassifier(n_estimators=100)
-clf.fit(X_train, y_train)
-y_pred = clf.predict(X_test)
+# print("Feature scaling done")
+# clf = RandomForestClassifier(n_estimators=100)
+# clf.fit(X_train, y_train)
+# y_pred = clf.predict(X_test)
+#
+# print("Classification done")
 
-print("Classification done")
-
-trustee = ClassificationTrustee(expert=clf)
-trustee.fit(X_train, y_train, num_iter=50, num_stability_iter=10, samples_size=0.3, verbose=True)
-dt, pruned_dt, agreement, reward = trustee.explain()
-dt_y_pred = dt.predict(X_test)
-
-print("Model explanation global fidelity report:")
-print(classification_report(y_pred, dt_y_pred))
-print("Model explanation score report:")
-print(classification_report(y_test, dt_y_pred))
+# trustee = ClassificationTrustee(expert=clf)
+# trustee.fit(X_train, y_train, num_iter=50, num_stability_iter=10, samples_size=0.3, verbose=True)
+# dt, pruned_dt, agreement, reward = trustee.explain()
+# dt_y_pred = dt.predict(X_test)
+#
+# print("Model explanation global fidelity report:")
+# print(classification_report(y_pred, dt_y_pred))
+# print("Model explanation score report:")
+# print(classification_report(y_test, dt_y_pred))
 
 #
 # models = []
@@ -124,5 +123,4 @@ for item in models:
     # cm = confusion_matrix(y_test, y_pred)
     # print(cm)
     print(accuracy_score(y_test, y_pred))
-
 
