@@ -38,30 +38,19 @@ def _paralell_process(func, input_args, cores=0):
 
 
 if __name__ == "__main__":
-    pcapDir = "/mnt/md0/jaber/oneminSplit/"
+    pcapDir = "/home/jaber/new15min/"
+#    dirs = ["s2f0", "s2f1", "s2f2", "s2f3", "s3f0", "s3f1", "s3f2", "s3f3"]
+    dirs = ['s3f0']
     arg_list = []
-    lst = (pcapDir + "s2f0" , 3)
-    arg_list.append(lst)
-    lst = (pcapDir + "s2f1", 3)
-    arg_list.append(lst)
-    lst = (pcapDir + "s2f2", 3)
-    arg_list.append(lst)
-    lst = (pcapDir + "s2f3", 3)
-    arg_list.append(lst)
-    lst = (pcapDir + "s3f0", 3)
-    arg_list.append(lst)
-    lst = (pcapDir + "s3f1", 3)
-    arg_list.append(lst)
-    lst = (pcapDir + "s3f2", 3)
-    arg_list.append(lst)
-    lst = (pcapDir + "s3f3", 3)
-    arg_list.append(lst)
+    for item in dirs:
+        lst = (pcapDir + item, 2)
+        arg_list.append(lst)
 
     print(arg_list)
     _paralell_process(removePcaps, arg_list)
 
 
-    minimumNumberOfPackets = 3
+    minimumNumberOfPackets = 2
     #removePcaps(pcapDir, minimumNumberOfPackets)
     #feedPcaps(pcapDir, minimumNumberOfPackets)
     # groupingPcapsforPP("a", "b")
