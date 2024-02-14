@@ -27,9 +27,19 @@ def _paralell_process(func, input_args, cores=0):
     with Pool(cores) as p:
         return p.starmap(func, input_args)
 
+def runCICsequence():
+    inputs = ['s2f2', 's2f3','s3f0','s3f1','s3f2','s3f3']
+    for folder in inputs:
+
+        command = 'docker run -v /home/jaber/new15min/'+ folder + '/:/tmp/server_ndt -v /home/jaber/cic/' + folder + ':/tmp/output/ --entrypoint /bin/bash --rm --memory=100g pinot.cs.ucsb.edu/cicflowmeter:latest -c \"find /tmp/server_ndt/ -type f -name \"*.pcap\"  | parallel java -Djava.library.path=/CICFlowMeter/jnetpcap/linux/jnetpcap-1.4.r1425/ -jar build/libs/CICFlowMeter-4.0.jar {} /tmp/output/\"'
+        print(command)
+        subprocess.run(command, shell=True)
+
+
 if __name__ == "__main__":
+    runCICsequence()
 #    batchCommands()
-    batchCommands()
+    # batchCommands()
     # for i in range(1, 112):
     #     print(i)
     #     subprocess.getoutput(f'mkdir /mnt/md0/jaber/cicflow/{str(i)}')
