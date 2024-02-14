@@ -18,14 +18,20 @@ def userFlowStats(userFlows):
     # Number of flows per user
     # Number of total users
     Lengths = []
+    topUsers = []
     for key in userFlows:
         Lengths.append(len(userFlows[key]))
+        if len(userFlows[key]) > 2000:
+            topUsers.append(key)
     Lengths.sort()
     print(Lengths)
     # Calculates how many users have n numbre of flows
     freq = Counter(Lengths)
     for item , frequency in freq.items():
         print(f"{item}: {frequency} times")
+    df = pd.DataFrame(topUsers)
+    df.to_csv("TopUsers.csv", index=False)
+
     with open("NumberofFlowsPerUser.txt", "w") as file:
         for item in Lengths:
             file.write(f'{item},')
@@ -182,22 +188,86 @@ def feedParallelDataset(input_dir):
 
     _paralell_process(createDatasetFromFlows, arg_list)
 
+def analyseTopUsers(UsersFiles):
+
+    users = pd.read_csv(UsersFiles)
+    for i in range(4):
+        print(i)
+
+
+def findService(fileName):
+    df = pd.read_csv(fileName)
+    # Direction 1 means the src is internal
+    if df['Direction'][0] == 1:
+        return [df['Dst Port'][0], df['Outside IP'][0]]
+    # Direction 0 means the dest is internal
+    else:
+        return [df['Src Port'][0], df['Outside IP'][0]]
+
+
+def checkParisDistribution(groupingsJson):
+    file = open(groupingsJson)
+    userFlows = json.load(file)
+    file.close()
+
+
+    ServicesPerUser = {}
+    cnt = 0
+    # Iterate over the userFlows  
+    for user, flows in userFlows.items():
+        print(user)
+        cnt+=1
+        print(cnt)
+        if cnt>1000:
+            break
+        services = []
+        # Count the number of flows with label 1
+        for item in flows:
+            services.append(findService(item))
+        unique_pairs = {(port, ip) for port, ip in services}
+        unique_ports = {port for port, ip in services}
+        ServicesPerUser[user] = (list(unique_ports),list(unique_pairs), len(userFlows[user]))
+    with open("ServicesPerUser1000Users.json", "w") as jsonfile:
+        json.dump(ServicesPerUser,jsonfile)
+
+    portNum =[]
+    serviceNum = []
+    userFlowLength= []
+    for user , stats in ServicesPerUser.items():
+        portNum.append(len(ServicesPerUser[user][0]))
+        serviceNum.append(len(ServicesPerUser[user][1]))
+        userFlowLength.append(ServicesPerUser[user][2])
+    import statistics
+    print(f'average port {statistics.mean(portNum)}')
+    print(max(portNum))
+    print(min(portNum))
+    print(statistics.median(portNum))
+    print(f'average service {statistics.mean(serviceNum)}')
+    print(max(serviceNum))
+    print(min(serviceNum))
+    print(statistics.median(serviceNum))
+    print(f'average flows per user {statistics.mean(userFlowLength)}')
+    print(max(userFlowLength))
+    print(min(userFlowLength))
+    print(statistics.median(userFlowLength))
+
+
 
 
 if __name__ == "__main__":
+    # df= pd.read_csv('TopUsers.csv')
+    # print("here")
     file = open("groupings.json")
     userFlows = json.load(file)
-    #userFlowStats(userFlows)
+    userFlowStats(userFlows)
     # combineSameUserFlows(userFlows)
     # file = open("CombinedPairs6Flows.json")
     # flowPairs = json.load(file)
     # createDatasetFromFlows(flowPairs)
-    feedFlows(userFlows)
-    soft_limit_bytes = 100 * 1024 * 1024 * 1024  # 2 GB
-    process = psutil.Process()
-    process.rlimit(psutil.RLIMIT_AS, (soft_limit_bytes, psutil.RLIM_INFINITY))
-    feedParallelDataset("/home/jaber/TrueDetective/CombinedPairsParallel/")
+    # feedFlows(userFlows)
+    # soft_limit_bytes = 100 * 1024 * 1024 * 1024  # 2 GB
+    # process = psutil.Process()
+    # process.rlimit(psutil.RLIMIT_AS, (soft_limit_bytes, psutil.RLIM_INFINITY))
+    # feedParallelDataset("/home/jaber/TrueDetective/CombinedPairsParallel/")
 #    createDatasetFromFlows("/home/jaber/TrueDetective/CombinedPairsParallel/1.json")
-
-
-
+    # checkParisDistribution("/home/jaber/TrueDetective/preprocess/groupings.json")
