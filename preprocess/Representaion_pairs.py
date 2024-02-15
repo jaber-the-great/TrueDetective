@@ -33,7 +33,7 @@ def userFlowStats(userFlows):
         json.dump(freq,jsonfile)
 
 
-def combineSameUserFlows(userFlows):
+def combineSameUserFlows(userFlowFile):
     combinedList = {}
     userList = list(userFlows.keys())
     weightList= [len(value) for value in userFlows.values()]
