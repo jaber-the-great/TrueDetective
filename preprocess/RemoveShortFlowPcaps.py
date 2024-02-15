@@ -14,6 +14,7 @@ def removePcaps(input_dir, numOfPackets):
 
                 pcapfile = subdir + '/' + file
                 output = subprocess.getoutput(f'tcpdump -r {pcapfile} 2>/dev/null | wc -l')
+                print(output)
                 if int(output) < numOfPackets:
                     output = subprocess.getoutput(f'rm {pcapfile}')
 
@@ -47,8 +48,8 @@ if __name__ == "__main__":
         arg_list.append(lst)
 
     print(arg_list)
-    _paralell_process(removePcaps, arg_list)
-
+#    _paralell_process(removePcaps, arg_list)
+    removePcaps(pcapDir+'s3f0',2)
 
     minimumNumberOfPackets = 2
     #removePcaps(pcapDir, minimumNumberOfPackets)
