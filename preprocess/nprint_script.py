@@ -3,6 +3,7 @@ import time
 from multiprocessing import Pool, Process, current_process
 import functools
 import subprocess
+from subprocess import call
 import shlex
 import os
 
@@ -187,6 +188,31 @@ def flatten(l):
     return [item for sublist in l for item in sublist]
 
 
+def nprintConversionPerUser(input_dir, output_dir):
+    arg_list = []
+
+    # Creating directory for each user in output_dir
+    # for subdir, dirs, files in os.walk(input_dir):
+    #     if dirs == []:
+    #         break
+    #     for dir in dirs:
+    #         call(f'mkdir -p {output_dir}{dir}', shell=True)
+    # print("finished")
+    # return
+    for subdir, dirs, files in os.walk(input_dir):
+
+        for file in files:
+            if file.endswith(".pcap"):
+                user = subdir.split('/')[-1]
+                filename = f'{output_dir}{user}/{file}.npt'
+                # filename = output_dir + "/" + file + ".npt"
+                lst = (subdir + "/" + file, filename, 1)
+                arg_list.append(lst)
+
+
+
+    _paralell_process(_nprint_files, arg_list)
+
 if __name__ == "__main__":
     print("here")
     # _pcap_split_impl("/data/patator-multi-cloud-benign2.pcap", "/data/patator-multi-cloud-pcaps/1")
@@ -194,7 +220,8 @@ if __name__ == "__main__":
     # time_series_conversion("/data/patator-multi-cloud-pcaps/", "/data/patator-multi-cloud-Curtains-timeseries/")
     # _time_series("/data/UCSB_labelled_Pcaps/1/2022-12-05-1415-merged-673912.pcap", "/data/tbd.csv")
     # patator_traffic_split("/data/patator-pcaps/", "/data/patator-pcaps/attack", "/data/patator-pcaps/benign")
-    nprint_conversion("/mnt/md0/jaber/nprintPcap/", "/mnt/md0/jaber/nprintFiles/")
+    # nprint_conversion("/mnt/md0/jaber/nprintPcap/", "/mnt/md0/jaber/nprintFiles/")
     # pcap_split("/data/heartbleed-new.pcap", "/data/heartbleed")
     #print(count)
     #pass
+    nprintConversionPerUser('/mnt/md0/jaber/groupedPcap/', '/mnt/md0/jaber/groupedNprint/')
