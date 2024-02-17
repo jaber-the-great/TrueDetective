@@ -7,30 +7,38 @@ import json
 from collections import Counter
 from itertools import combinations
 import random
+import ipaddress
+import statistics
+import numpy as np
 
-
-# TODO: Don't forget to drop src and dest IP from headers dataset
-# TODO: Look in each direcotry and find the number of items --> just use the dictionary
-# TODO: How many pairs with True in each directory: n (n-1)/2. Create all those pairs
-# TODO: Randmoly slec
 def userFlowStats(userFlows):
     # Number of flows per user
     # Number of total users
     Lengths = []
     for key in userFlows:
         Lengths.append(len(userFlows[key]))
+        if not is_valid_ip(key):
+            print("error")
+            print(key)
     Lengths.sort()
-    print(Lengths)
+    # print(Lengths)
     # Calculates how many users have n numbre of flows
     freq = Counter(Lengths)
     for item , frequency in freq.items():
         print(f"{item}: {frequency} times")
+    print(statistics.mean(Lengths))
+    print(statistics.median(Lengths))
+    print(statistics.stdev(Lengths))
+    print(min(Lengths))
+    print(max(Lengths))
+    print(sum(Lengths))
+
     with open("NumberofFlowsPerUser.txt", "w") as file:
         for item in Lengths:
             file.write(f'{item},')
 
-    with open("FreqOfNumFlowsPerUsers.json", "w") as jsonfile:
-        json.dump(freq,jsonfile)
+    # with open("FreqOfNumFlowsPerUsers.json", "w") as jsonfile:
+    #     json.dump(freq,jsonfile)
 
 
 def combineSameUserFlows(userFlowFile):
@@ -132,15 +140,37 @@ def createDatasetFromFlows(flowPairs, index ):
     df.to_pickle(f'/mnt/md0/jaber/dataset/{index}.pkl')
 
 
+def MergeUserGroups(userGroupsDir):
+    cnt = 0
+    interfaceList = []
+    AllUsers = defaultdict(list)
+    for subdir, dirs, files in  os.walk(userGroupsDir):
+        for file in files:
+            if file.startswith("UserFlows"):
+                currentFile =  open(f'{userGroupsDir}/{file}')
+                currentUser = json.load(currentFile)
+                interfaceList.append(currentUser)
+    for usergp in interfaceList:
+        for user , flows in usergp.items():
+            for flow in flows:
+                AllUsers[user].append(flow)
 
+    with open(f'{userGroupsDir}/AllUsers.json', 'w') as jsonfile:
+        json.dump(AllUsers,jsonfile)
 
+def is_valid_ip(ip_str):
+    try:
+        ipaddress.ip_address(ip_str)
+        return True
+    except ValueError:
+        return False
 
 if __name__ == "__main__":
     # inputFile = ("/mnt/md0/jaber/Combine20Flows.json")
     # feedPairs(inputFile)
-    file = open("/mnt/md0/jaber/groupings.json")
-    userFlows = json.load(file)
-    userFlowStats(userFlows)
+    # file = open("/home/jaber/userGroups/UserFlows_s2f1.json")
+    # userFlows = json.load(file)
+    # userFlowStats(userFlows)
     # combineSameUserFlows(userFlows)
     # file = open("CombinedPairs6Flows.json")
     # flowPairs = json.load(file)
@@ -153,5 +183,9 @@ if __name__ == "__main__":
     # print(lengths)
     # print(sum(lengths))
 
+    # MergeUserGroups('/home/jaber/userGroups')
+    file = open('/home/jaber/userGroups/AllUsers.json')
+    userFlows = json.load(file)
+    userFlowStats(userFlows)
 
 
