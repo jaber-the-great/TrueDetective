@@ -7,4 +7,10 @@
 15G	s3f2	1254405
 16G	s3f3	1303381
 
-
+Flows Per user:
+Mean: 143.7
+Median: 20
+STD: 533
+Min: 1
+Max: 44505
+Sum: 6,137.230
