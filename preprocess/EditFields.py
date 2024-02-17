@@ -59,7 +59,8 @@ def groupAndEditCICFlow(input_dir, output_dir):
         for file in files:
             if file.endswith(".csv"):
                 cnt +=1
-                print(cnt)
+                if cnt%1000 ==0:
+                    print(cnt)
                 inputFile = input_dir + '/' + file
                 outputFile = output_dir + '/' + file
                 try:
@@ -109,7 +110,14 @@ def groupAndEditCICFlow(input_dir, output_dir):
 
 if __name__ == "__main__":
     warnings.simplefilter(action='ignore', category=(SettingWithCopyWarning))
-    groupAndEditCICFlow("/home/jaber/cic/s3f1" , "/home/jaber/editedcicflow/s3f1")
+    dirs =  ['s2f0', 's2f1', 's2f2', 's2f3', 's3f0' , 's3f1' ,'s3f2' ,'s3f3' ]
+    arglist = []
+    for item in dirs:
+        arg = ("/home/jaber/cic/" + item , "/home/jaber/editedcicflow/" + item)
+        arglist.append(arg)
+    print(arglist)
+    _paralell_process(groupAndEditCICFlow, arglist)
+    # groupAndEditCICFlow("/home/jaber/cic/s3f1" , "/home/jaber/editedcicflow/s3f1")
     # readAndEditFlow("/home/jaber/TrueDetective/cicFilteredPcaps/1/s3-2022-04-29-1215-ens4f1-2022-04-29-1215-365895.pcap_Flow.csv" ,"/home/jaber/TrueDetective/editedCICFilteredPcaps/1")
     # for i in range(1,112):
     #     print(i)
