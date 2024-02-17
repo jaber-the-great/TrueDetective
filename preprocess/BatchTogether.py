@@ -72,35 +72,46 @@ def userFlowsToDictionary(input_dir):
 
 def moveUserFlowsToDirectory(userLabel, files, output_dir):
     call(f'mkdir {output_dir}/{userLabel}', shell=True)
-    for file in files:
-        call(f'cp {file} {output_dir}/{userLabel}/', shell=True)
 
+
+
+def movePcapCICToUserLabel(userGroupFileName, interface):
+    pcapDir = "/mnt/md0/jaber/groupedPcap/"
+    cicDir = "/mnt/md0/jaber/groupedCIC/"
+
+    file = open(userGroupFileName)
+    userGroup = json.load(file)
+    cnt = 0
+    for user , flows in userGroup.items():
+        try:
+            cnt +=1
+            if cnt% 1000 == 0:
+                print(cnt)
+
+
+            call(f'mkdir -p {pcapDir}{user}', shell=True)
+            call(f'mkdir -p {cicDir}{user}', shell=True)
+            for file in flows:
+                file = file.split('/')[-1]
+                cicFile = "/home/jaber/editedcicflow/" + interface + "/" + file
+                call(f'cp {cicFile} {cicDir}{user}/', shell=True)
+                pcapFile = "/mnt/md0/jaber/new15min/" + interface + "/" + file
+                pcapFile = pcapFile.removesuffix("_Flow.csv")
+                call(f'cp {pcapFile} {pcapDir}{user}/', shell=True)
+        except:
+            print(f'{user} Had some errors')
+
+
+
+# /mnt/md0/jaber/new15min/s2f0
 
 if __name__ == "__main__":
 
+    interfaceList = ['s2f0', 's2f1', 's2f2', 's2f3', 's3f0' , 's3f1' ,'s3f2' ,'s3f3' ]
+    argList = []
+    for interface in interfaceList:
+        file = f'/home/jaber/userGroups/UserFlows_{interface}.json'
+        argList.append((file,interface))
 
-    # inputDir = "/mnt/md0/jaber/mergedCICandHeader"
-    # userFlowsToDictionary(inputDir)
+    _paralell_process(movePcapCICToUserLabel, argList)
 
-    # feed_packets(UserFlows, outputDir)
-
-    file = open("/mnt/md0/jaber/groupings.json")
-    Lengths = []
-    UserFlow = json.load(file)
-    # counter = 0
-    # arg_list = []
-    # for key, value in UserFlow.items():
-    #     counter+=1
-    #     print(counter)
-    #     moveUserFlowsToDirectory(key, value, outputDir)
-
-
-    for key in UserFlow:
-        Lengths.append(len(UserFlow[key]))
-    Lengths.sort()
-    print(Lengths)
-    print(len(Lengths))
-    print(sum(Lengths))
-    print(sum(Lengths)//len(Lengths))
-    import statistics
-    print(statistics.median(Lengths))
