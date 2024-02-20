@@ -18,5 +18,20 @@ STD: 533
 Min: 1
 Max: 44505
 Sum: 6,137.230
+Number of users: 42,703
 Total Pcap after cleaning: 109G
 Total Pcap before cleaning: 152G (due to the default size of pcaps)
+
+Flows per user after removing users with less than 5 flows:
+Mean: 232.7
+Median: 100
+STD: 664
+Sum: 6.111,270
+Number of users: 26,255
+Number of users with at least two flows: 32,729
+
+
+No Flow with IP options field 
+110 ICMP flows 
+
+Totoal flows with TCP/UDP header and at least 5 packets: 4,903,976 20G
