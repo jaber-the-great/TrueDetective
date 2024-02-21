@@ -48,10 +48,8 @@ def datasetPairGenerate(userFlows, outputFile, numberOfUsers,  maxFlows):
     # Random sample: selection without replacement, but random choice is with replacement
     print(f'Generating pairs for {outputFile}')
     combinedList = {}
-    pairsPerClass = int(maxFlows*(maxFlows+1)//2)
+    pairsPerClass = int(maxFlows*(maxFlows-1)//2)
     cnt= 0
-
-
 
     sampledKeys = random.sample(list(userFlows.keys()), numberOfUsers)
     datasetUsers = {key: userFlows[key] for key in sampledKeys}
@@ -63,14 +61,16 @@ def datasetPairGenerate(userFlows, outputFile, numberOfUsers,  maxFlows):
     for user , flows in datasetUsers.items():
         try:
             pairs = []
-            for i in range(pairsPerClass):
-                pair = random.sample(flows, 2)
-                pair[0]=   user + '/'  + pair[0].split('/')[-1]
-                pair[1] =   user + '/' + pair[1].split('/')[-1]
-                pairs.append(pair + [1])
+            all_pairs = list(combinations(flows, 2))
+            if len(all_pairs) < pairsPerClass:
+                pairs = all_pairs
+            else:
+                pairs = random.sample(all_pairs, pairsPerClass)
 
+            pairs = [(user + '/'  + p[0].split('/')[-1], user + '/' + p[1].split('/')[-1], 1) for p in pairs]
+            currentNumberOfPairs = len(pairs)
 
-            for i in range(pairsPerClass):
+            for i in range(currentNumberOfPairs):
                 otherUser = random.choices(userList)[0]
                 while otherUser == user:
                     otherUser = random.choices(userList)[0]
@@ -96,8 +96,8 @@ def groupOfDatasetGenerator(userFlowsFile, outputDir, minFlows, maxFlows):
     for user in usersToRemove:
         del userFlows[user]
 
-    for i in range(1, 50):
-        numberOfUsers = random.randint(100, 2000)
+    for i in range(1, 5):
+        numberOfUsers = random.randint(5, 50)
         outputFile = f'{outputDir}/{i}_{numberOfUsers}.json'
         arg = (userFlows,outputFile,numberOfUsers , maxFlows)
         arg_list.append(arg)
@@ -140,8 +140,8 @@ def readAndMergePairFiles( userPairsFile, OutputFile):
                 print(e)
                 # print(pairs)
 
-        df = pd.DataFrame(dataset , columns=cols)
-        df.to_csv(OutputFile + ".json", index = False)
+    df = pd.DataFrame(dataset , columns=cols)
+    df.to_csv(OutputFile + ".json", index = False)
 
 def parallelReadAndMergePairs(inputDir, outputDir):
 
@@ -277,6 +277,25 @@ def is_valid_ip(ip_str):
         return True
     except ValueError:
         return False
+def userPairsStat(inputDir, outputFile):
+    outFile = open(outputFile,"w")
+    cnt = 0
+    for subdir, dirs, files in  os.walk(inputDir):
+        for file in files:
+            if file.endswith(".json"):
+                print(file)
+                f = open(subdir+file)
+                userPairs = json.load(f)
+                numOfPairs = []
+                for user , pairs in userPairs.items():
+                    numOfPairs.append(len(pairs))
+                outFile.write(f'Dataset name: {file} \n')
+                outFile.write(f'Min number of pairs per user: {min(numOfPairs)} \n')
+                outFile.write(f'Max number of pairs per user: {max(numOfPairs)} \n')
+                outFile.write(f'Average number of pairs per user: {statistics.mean(numOfPairs)} \n')
+                outFile.write(f'Median number of pairs per user: {statistics.median(numOfPairs)} \n')
+
+    outFile.close()
 
 if __name__ == "__main__":
     # inputFile = ("/mnt/md0/jaber/Combine20Flows.json")
@@ -301,9 +320,10 @@ if __name__ == "__main__":
     # userFlows = json.load(file)
     #userFlowStats(userFlows)
     #datasetPairGenerate(userFlows, 'temp', 1000, 5,30)
-    #groupOfDatasetGenerator('/home/jaber/userGroups/AllUsers.json', '/mnt/md0/jaber/pairsDatasets',5 , 30)
+    # groupOfDatasetGenerator('/home/jaber/userGroups/AllUsers.json', '/mnt/md0/jaber/pairsDatasets',5 , 30)
     # readAndMergePairFiles('/mnt/md0/jaber/pairsDatasets/49_292.json', '/mnt/md0/jaber/datasets/first.pkl')
     parallelReadAndMergePairs("/mnt/md0/jaber/pairsDatasets/", "/mnt/md0/jaber/datasets/")
+    # userPairsStat('/mnt/md0/jaber/pairsDatasets/', '/home/jaber/TrueDetective/preprocess/PairsStat.txt')
 
 
 
