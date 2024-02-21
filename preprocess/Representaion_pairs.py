@@ -12,36 +12,7 @@ import statistics
 import numpy as np
 
 
-def userFlowStats(userFlows):
-    # Number of flows per user
-    # Number of total users
-    Lengths = []
-    for key in userFlows:
-        if len(userFlows[key]) < 2:
-            continue
-        Lengths.append(len(userFlows[key]))
-        if not is_valid_ip(key):
-            print("error")
-            print(key)
-    Lengths.sort()
-    # print(Lengths)
-    # Calculates how many users have n numbre of flows
-    freq = Counter(Lengths)
-    for item , frequency in freq.items():
-        print(f"{item}: {frequency} times")
-    print(statistics.mean(Lengths))
-    print(statistics.median(Lengths))
-    print(statistics.stdev(Lengths))
-    print(min(Lengths))
-    print(max(Lengths))
-    print(sum(Lengths))
 
-    with open("NumberofFlowsPerUser.txt", "w") as file:
-        for item in Lengths:
-            file.write(f'{item},')
-
-    # with open("FreqOfNumFlowsPerUsers.json", "w") as jsonfile:
-    #     json.dump(freq,jsonfile)
 
 
 def datasetPairGenerate(userFlows, outputFile, numberOfUsers,  maxFlows):
@@ -198,29 +169,6 @@ def combineUserFlows(userFlowFile):
     with open("Combine20Flows.json", "w") as jsonfile:
         json.dump(combinedList,jsonfile)
 
-def feedPairs(inputFile):
-    arg_list = []
-    userGroups = {}
-    with open(inputFile) as file:
-        flowPairs = json.load(file)
-
-    cnt = 0
-    fileNameCounter = 0
-    for user, pairs in flowPairs.items():
-        # create list of dictionaries where each dictionary contins 1000 user  
-        cnt +=1
-        if cnt % 1000 == 0 or cnt == len(flowPairs):
-            fileNameCounter += 1    
-            
-            lst = (userGroups, fileNameCounter)
-            arg_list.append(lst)
-            userGroups = {}
-
-
-        userGroups[user] = pairs
-
-    print(arg_list)
-    _paralell_process(createDatasetFromFlows, arg_list)
 
 def _paralell_process(func, input_args, cores=0):
     if cores == 0:
@@ -228,102 +176,18 @@ def _paralell_process(func, input_args, cores=0):
     with Pool(cores) as p:
         return p.starmap(func, input_args)
 
-def createDatasetFromFlows(flowPairs, index ):
-    dataset = []
-    cols = []
-    cnt = 0
-    for user, pairs in flowPairs.items():
-        cnt+=1
-        print(cnt)
-        for pair in pairs:
-            try:
-
-                firstFlow = pd.read_csv(f'/mnt/md0/jaber/tempfile/{pair[0]}')
-                secFlow = pd.read_csv(f'/mnt/md0/jaber/tempfile/{pair[1]}')
-                label = pair[2]
-                joined = firstFlow.values.tolist()[0] + secFlow.values.tolist()[0] + [label]
-                dataset.append(joined)
-                if not cols:
-                    cols = list(firstFlow.columns) + list(secFlow.columns) + ['label']
-            except:
-                print(user)
-                #print(pairs)
-
-    df = pd.DataFrame(dataset, columns=cols)
-    df.to_pickle(f'/mnt/md0/jaber/dataset/{index}.pkl')
 
 
-def MergeUserGroups(userGroupsDir):
-    cnt = 0
-    interfaceList = []
-    AllUsers = defaultdict(list)
-    for subdir, dirs, files in  os.walk(userGroupsDir):
-        for file in files:
-            if file.startswith("UserFlows"):
-                currentFile =  open(f'{userGroupsDir}/{file}')
-                currentUser = json.load(currentFile)
-                interfaceList.append(currentUser)
-    for usergp in interfaceList:
-        for user , flows in usergp.items():
-            for flow in flows:
-                AllUsers[user].append(flow)
-
-    with open(f'{userGroupsDir}/AllUsers.json', 'w') as jsonfile:
-        json.dump(AllUsers,jsonfile)
-
-def is_valid_ip(ip_str):
-    try:
-        ipaddress.ip_address(ip_str)
-        return True
-    except ValueError:
-        return False
-def userPairsStat(inputDir, outputFile):
-    outFile = open(outputFile,"w")
-    cnt = 0
-    for subdir, dirs, files in  os.walk(inputDir):
-        for file in files:
-            if file.endswith(".json"):
-                print(file)
-                f = open(subdir+file)
-                userPairs = json.load(f)
-                numOfPairs = []
-                for user , pairs in userPairs.items():
-                    numOfPairs.append(len(pairs))
-                outFile.write(f'Dataset name: {file} \n')
-                outFile.write(f'Min number of pairs per user: {min(numOfPairs)} \n')
-                outFile.write(f'Max number of pairs per user: {max(numOfPairs)} \n')
-                outFile.write(f'Average number of pairs per user: {statistics.mean(numOfPairs)} \n')
-                outFile.write(f'Median number of pairs per user: {statistics.median(numOfPairs)} \n')
-
-    outFile.close()
 
 if __name__ == "__main__":
-    # inputFile = ("/mnt/md0/jaber/Combine20Flows.json")
-    # feedPairs(inputFile)
-    # file = open("/home/jaber/userGroups/UserFlows_s2f1.json")
-    # userFlows = json.load(file)
-    # userFlowStats(userFlows)
-    # combineUserFlows(userFlows)
-    # file = open("CombinedPairs6Flows.json")
-    # flowPairs = json.load(file)
-    # createDatasetFromFlows(flowPairs)
-    # file = open("/mnt/md0/jaber/Combine150Flows.json")
-    # datasetPairs = json.load(file)
-    # lengths = []
-    # for key , value in datasetPairs.items():
-    #     lengths.append(len(value))
-    # print(lengths)
-    # print(sum(lengths))
 
-    # MergeUserGroups('/home/jaber/userGroups')
-    # file = open('/home/jaber/userGroups/AllUsers.json')
-    # userFlows = json.load(file)
-    #userFlowStats(userFlows)
+
+
     #datasetPairGenerate(userFlows, 'temp', 1000, 5,30)
     # groupOfDatasetGenerator('/home/jaber/userGroups/AllUsers.json', '/mnt/md0/jaber/pairsDatasets',5 , 30)
     # readAndMergePairFiles('/mnt/md0/jaber/pairsDatasets/49_292.json', '/mnt/md0/jaber/datasets/first.pkl')
     parallelReadAndMergePairs("/mnt/md0/jaber/pairsDatasets/", "/mnt/md0/jaber/datasets/")
-    # userPairsStat('/mnt/md0/jaber/pairsDatasets/', '/home/jaber/TrueDetective/preprocess/PairsStat.txt')
+
 
 
 
