@@ -55,18 +55,21 @@ def userPairsStat(inputDir, outputFile):
     cnt = 0
     for subdir, dirs, files in  os.walk(inputDir):
         for file in files:
-            if file.endswith(".json"):
+            # if file.endswith(".json"):
+            if True:
                 print(file)
                 f = open(subdir+file)
                 userPairs = json.load(f)
                 numOfPairs = []
                 for user , pairs in userPairs.items():
                     numOfPairs.append(len(pairs))
+
                 outFile.write(f'Dataset name: {file} \n')
                 outFile.write(f'Min number of pairs per user: {min(numOfPairs)} \n')
                 outFile.write(f'Max number of pairs per user: {max(numOfPairs)} \n')
                 outFile.write(f'Average number of pairs per user: {statistics.mean(numOfPairs)} \n')
                 outFile.write(f'Median number of pairs per user: {statistics.median(numOfPairs)} \n')
+                outFile.write(f'Sum of number of pairs per user: {sum(numOfPairs)} \n')
 
     outFile.close()
 
@@ -88,10 +91,29 @@ def MergeUserGroups(userGroupsDir):
     with open(f'{userGroupsDir}/AllUsers.json', 'w') as jsonfile:
         json.dump(AllUsers,jsonfile)
 
+def checkTestTrainOverlap(testFile, trainFileDir):
+    file1 = open(testFile)
+    testPairs = json.load(file1)
+    for subdir, dirs , files in os.walk(trainFileDir):
+        for file in files:
+            jsonFile = open(subdir + file)
+            trainPairs = json.load(jsonFile)
+            for user in testPairs:
+                if user in trainPairs:
+                    print(file)
+                    print(user)
+                    print(len(testPairs[user]))
+    # Removing the single outlier from the dataset
+    del testPairs['169.231.110.64']
+    with open('/mnt/md0/jaber/testSetsPairs/valid20users.json', 'w') as jsonfile:
+        json.dump(testPairs, jsonfile)
+
+
 if __name__ == "__main__":
     # MergeUserGroups('/home/jaber/userGroups')
     # file = open('/home/jaber/userGroups/AllUsers.json')
     # userFlows = json.load(file)
     #userFlowStats(userFlows)
-    # userPairsStat('/mnt/md0/jaber/pairsDatasets/', '/home/jaber/TrueDetective/preprocess/PairsStat.txt')
-    pass
+    #userPairsStat('/mnt/md0/jaber/pairsDatasets/', '/home/jaber/TrueDetective/preprocess/PairsStat.txt')
+
+    checkTestTrainOverlap('/mnt/md0/jaber/testSetsPairs/1_20.json_AllRandom' , '/mnt/md0/jaber/pairsDatasets/',)
