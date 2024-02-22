@@ -6,7 +6,7 @@ import subprocess
 from subprocess import call
 import shlex
 import os
-
+import json
 count = 0
 
 
@@ -23,13 +23,17 @@ def _nprint_files(input_file, output_file, flag):
         # subprocess.run(cmd2, shell = True)
     elif flag == 1:
         # Please note that you are including the payload and you need a modified processing script to convert this npt into field wise or byte wise representation. The existing script doesn't support this functionality.
-        cmd1 = (
-            "nprint -P "
-            + input_file
-            + " --absolute_timestamps  --tcp --udp --ipv4 --icmp -p 20 -W "
-            + output_file
-        )
-        subprocess.call(cmd1, shell=True)
+        try:
+            cmd1 = (
+                "nprint -P "
+                + input_file
+                + " --absolute_timestamps  --tcp --udp --ipv4 -p 12 -W "
+                + output_file
+            )
+            subprocess.call(cmd1, shell=True)
+        except Exception as e:
+            print("e")
+            print(input_file)
         # cmd2 = 'mv ' + input_file + ' ' + path
         # subprocess.run(cmd2, shell = True)
     # elif
@@ -47,6 +51,9 @@ def nprint_conversion(input_dir, output_dir):
 
 
     _paralell_process(_nprint_files, arg_list)
+
+
+
 
 
 def _time_series(input_file, output_file):
@@ -213,6 +220,43 @@ def nprintConversionPerUser(input_dir, output_dir):
 
     _paralell_process(_nprint_files, arg_list)
 
+def nprint_userPairs(pairsFile, output_dir):
+    npts = {}
+    argList = []
+    file = open(pairsFile)
+    userPairs = json.load(file)
+    subDirName = pairsFile.split('/')[-1].rstrip('.json')
+    call(f'mkdir -p {output_dir}{subDirName}', shell=True)
+    cnt = 0
+    totalPair = 0
+    for user, pairs in userPairs.items():
+        totalPair += len(pairs)
+        for pair in pairs:
+
+            firstPcap = '/mnt/md0/jaber/groupedPcap/' + pair[0].rstrip('_Flow.csv')
+            secondPcap = '/mnt/md0/jaber/groupedPcap/' +  pair[1].rstrip('_Flow.csv')
+            firstName = pair[0].split('/')[-1].rstrip('pcap_Flow.csv') + '.npt'
+            secondName = pair[1].split('/')[-1].rstrip('pcap_Flow.csv') + '.npt'
+            firstNpt = output_dir + subDirName + '/' + firstName
+            secondNpt =  output_dir + subDirName + '/' + secondName
+            if firstName not in npts:
+                cnt+=1
+                npts[firstName] = 1
+                argList.append((firstPcap, firstNpt,1))
+            if secondName not in npts:
+                cnt+=1
+                npts[secondName] = 1
+                argList.append((secondPcap,secondNpt,1))
+
+
+
+    _paralell_process(_nprint_files, argList)
+def feed_nprint_userPairs():
+    for subdir, dirs, files in os.walk('/mnt/md0/jaber/pairsDatasets/'):
+        for file in files:
+            if file.endswith(".json"):
+                nprint_userPairs(subdir + file, '/mnt/md0/jaber/nprintPerDataset/')
+
 if __name__ == "__main__":
     print("here")
     # _pcap_split_impl("/data/patator-multi-cloud-benign2.pcap", "/data/patator-multi-cloud-pcaps/1")
@@ -224,4 +268,8 @@ if __name__ == "__main__":
     # pcap_split("/data/heartbleed-new.pcap", "/data/heartbleed")
     #print(count)
     #pass
-    nprintConversionPerUser('/mnt/md0/jaber/groupedPcap/', '/mnt/md0/jaber/groupedNprint/')
+    #nprintConversionPerUser('/mnt/md0/jaber/groupedPcap/', '/mnt/md0/jaber/groupedNprint/')
+
+
+    nprint_userPairs('/mnt/md0/jaber/testSet/1_20.json_AllRandom.csv', '/mnt/md0/jaber/nprintPerDataset/')
+    #feed_nprint_userPairs()
