@@ -156,8 +156,8 @@ def groupOfDatasetPairGenerator(userFlowsFile, outputDir, minFlows, maxFlows):
             usersToRemove.append(user)
     for user in usersToRemove:
         del userFlows[user]
-    usersLength = [5, 20, 50, 100, 500, 1000]
-    for i in range(0, 6):
+    usersLength = [5, 20, 50, 100]
+    for i in range(0, 4):
         #numberOfUsers = random.randint(5, 5)
         numberOfUsers = usersLength[i]
         outputFile = f'{outputDir}/{i}_{numberOfUsers}.json'
@@ -168,8 +168,45 @@ def groupOfDatasetPairGenerator(userFlowsFile, outputDir, minFlows, maxFlows):
 
     #print(arg_list)
         _paralell_process(datasetPairGenerateAllRandom,arg_list)
-        _paralell_process(datasetPairGenerateFullCombination, arg_list)
-        _paralell_process(datasetPairGenerateNoRepetition, arg_list)
+        #_paralell_process(datasetPairGenerateFullCombination, arg_list)
+        #_paralell_process(datasetPairGenerateNoRepetition, arg_list)
+
+def testSetPairGeneratorAllRandom(userFlows, usersToExclude ,outputFile, numberOfPairs):
+    # Random sample: selection without replacement, but random choice is with replacement
+    print(f'Generating test set pair for {outputFile}')
+    combinedList = {}
+    cnt= 0
+
+    for user in usersToExclude:
+        del userFlows[user]
+
+    userList =  list(userFlows.keys())
+    weightList= [len(value) for value in userFlows.values()]
+
+
+    for i in range(numberOfPairs):
+        try:
+            pairs = []
+            user = random.choice(userList)
+            flows = userFlows[user]
+            pair = random.sample(flows, 2)
+            pair = [user + '/'  + pair[0].split('/')[-1], user + '/' + pair[1].split('/')[-1], 1]
+            pairs.append(pair)
+
+            differentUsers = random.sample(userList, 2)
+            pair = [random.choice(userFlows[differentUsers[0]]), random.choice(userFlows[differentUsers[1]]), 0]
+            pair[0] = differentUsers[0] + '/' + pair[0].split('/')[-1]
+            pair[1] =  differentUsers[1] + '/' + pair[1].split('/')[-1]
+            pairs.append(pair)
+            combinedList[i] = pairs
+        except Exception as e:
+            print(e)
+            print(f'Error for user {user} or {differentUsers}')
+
+    with open(f'{outputFile}_Test' , "w") as jsonfile:
+        json.dump(combinedList,jsonfile)
+
+
 
 def readAndMergePairFiles( userPairsFile, OutputFile):
     dataset = []
@@ -234,9 +271,11 @@ def _paralell_process(func, input_args, cores=0):
 if __name__ == "__main__":
 
     #datasetPairGenerate(userFlows, 'temp', 1000, 5,30)
-    # groupOfDatasetPairGenerator('/home/jaber/userGroups/AllUsers.json', '/mnt/md0/jaber/pairsDatasets',5 , 30)
-    #readAndMergePairFiles('/mnt/md0/jaber/pairsDatasets/1_5.json_FullCombination', '/mnt/md0/jaber/datasets/first.csv')
-    parallelReadAndMergePairs("/mnt/md0/jaber/pairsDatasets/", "/mnt/md0/jaber/datasets/")
+    #
+    # groupOfDatasetPairGenerator('/home/jaber/userGroups/AllUsers.json', '/mnt/md0/jaber/testSetsPairs',5 , 30)
+    # readAndMergePairFiles('/mnt/md0/jaber/pairsDatasets/1_5.json_FullCombination', '/mnt/md0/jaber/datasets/first.csv')
+    parallelReadAndMergePairs("/mnt/md0/jaber/testSetsPairs/", "/mnt/md0/jaber/testSet/")
+
 
 
 
