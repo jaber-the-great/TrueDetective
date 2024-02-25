@@ -108,12 +108,51 @@ def checkTestTrainOverlap(testFile, trainFileDir):
     with open('/mnt/md0/jaber/testSetsPairs/valid20users.json', 'w') as jsonfile:
         json.dump(testPairs, jsonfile)
 
+def numberOfFlows(userFile):
+    # Counting the total number of flows beside checking consistency between cic files and header and pcap files
+    # Some flows removed from cic, they were corresponding to icmp (around 110 flows)
+    file = open(userFile)
+    userFlows = json.load(file)
+    file.close()
+    totalFlows = 0
+    itemsToRemove = []
+    for user , flows in userFlows.items():
+        totalFlows +=len(flows)
+        for flow in flows:
 
+            name = flow.split('/')[-1]
+            name = f'{user}/{name}'
+            cicName = f'/mnt/md0/jaber/groupedCIC/{name}'
+            headerName = f'/mnt/md0/jaber/groupedHeader/{name}'
+            headerName = headerName.replace("_Flow.csv",".csv")
+            pcapName = f'/mnt/md0/jaber/groupedPcap/{name}'
+            pcapName = pcapName.rstrip("_Flow.csv")
+
+            if not os.path.exists(cicName) or not os.path.exists(headerName) or  not os.path.exists(pcapName):
+                if not os.path.exists(cicName):
+                    print("cicIssue")
+                if not os.path.exists(headerName) :
+                    print("headerIssue")
+                if not os.path.exists(pcapName) :
+                    print("pcapIssue")
+                print(user)
+                print(flow)
+                print(name)
+                itemsToRemove.append([user, flow])
+
+    print(totalFlows)
+    for user, flow in itemsToRemove:
+        userFlows[user].remove(flow)
+
+    print(f'Total number of flows is: {totalFlows}')
+    with open(userFile + "test", "w") as jsonfile:
+        json.dump(userFlows, jsonfile)
 if __name__ == "__main__":
-    # MergeUserGroups('/home/jaber/userGroups')
+    #MergeUserGroups('/home/jaber/userGroups')
     # file = open('/home/jaber/userGroups/AllUsers.json')
     # userFlows = json.load(file)
     #userFlowStats(userFlows)
     #userPairsStat('/mnt/md0/jaber/pairsDatasets/', '/home/jaber/TrueDetective/preprocess/PairsStat.txt')
 
-    checkTestTrainOverlap('/mnt/md0/jaber/testSetsPairs/1_20.json_AllRandom' , '/mnt/md0/jaber/pairsDatasets/',)
+    # checkTestTrainOverlap('/mnt/md0/jaber/testSetsPairs/1_20.json_AllRandom' , '/mnt/md0/jaber/pairsDatasets/',)
+    numberOfFlows('/home/jaber/userGroups/AllUsers.json')
