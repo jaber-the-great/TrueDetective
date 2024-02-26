@@ -159,6 +159,16 @@ def byte_extract_tls(packet, NumberOfBytes):
     else:
         data = list( bytes(tls)[:NumberOfBytes])
     return data
+if __name__=="__main__":
+    # numberOfBytesToExtract = 12
+    # PacketsPerflow = 3
+    # inputFiles = "/home/jaber/TrueDetective/filteredPcaps/"
+    # outputDirectory = "/home/jaber/TrueDetective/headers"
+    # for i in range(1,746):
+    #     print(i)
+    #     feed_packets(inputFiles + str(i),outputDirectory, PacketsPerflow)
+#     HeaderExtract("/home/jaber/TrueDetective/pcaps/file-0001.pcap","/home/jaber/TrueDetective/test.csv" )
+    SeveralHeaderExtract("/home/jaber/TrueDetective/s2f0_00000_20221205201501-0004.pcap" , "/home/jaber/TrueDetective/", 3)
 
 
 if __name__=="__main__":
