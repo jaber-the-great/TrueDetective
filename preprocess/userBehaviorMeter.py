@@ -4,6 +4,7 @@ from multiprocessing import Pool
 import os
 import datetime
 import json
+import time
 
 
 # input = ['/mnt/md0/jaber/groupedcicflow/169.231.141.110/s2f3_00000_20221205201500-45086.pcap_Flow.csv',
@@ -14,9 +15,21 @@ import json
 
 
 
-def flowStat(userFlows, outputDir,captureStartTime, captureDuration):
+def userTrafficPattern(userFlowsDir, outputDir,captureStartTime, captureDuration):
     windowStat = {}
-    
+    userFlows = []
+    for filename in os.listdir(userFlowsDir):
+        # Check if the item is a file (not a subdirectory)
+        if os.path.isfile(os.path.join(userFlowsDir, filename)):
+            if filename.endswith(".csv"):
+                data = pd.read_csv(os.path.join(userFlowsDir, filename))
+                userFlows.append(data)
+
+
+
+    if userFlows == []:
+        return
+    userFlows = pd.concat(userFlows)
     
     # Flow Duration
     windowStat['TotalFlowDuration'] = userFlows['Flow Duration'].sum()
@@ -158,7 +171,7 @@ def flowIdleTime(Start, Duration, captureTime, CaptureDuration ):
     previous_end = pd.to_datetime(captureTime)
 
     captureTime = pd.to_datetime(captureTime)
-    capDuration = pd.to_timedelta(captureDuration, unit='s')
+    capDuration = pd.to_timedelta(CaptureDuration, unit='s')
     endTime = captureTime + capDuration
 
     for _, row in df.iterrows():
@@ -189,30 +202,63 @@ def flowIdleTime(Start, Duration, captureTime, CaptureDuration ):
     idle = pd.Series(idle)
     return idle
 
-if __name__ == '__main__':
+def _paralell_process(func, input_args, cores=0):
+    if cores == 0:
+        cores = os.cpu_count()
+    with Pool(cores) as p:
+        return p.starmap(func, input_args)
 
-    
-    captureStartTime = "05/12/2022 08:15:00 PM"
-    captureStartTime= pd.to_datetime(captureStartTime)
-    captureDuration = 60
-    # read all files in the directory and put them in a list
-    inputDir = "/mnt/md0/jaber/groupedcicflow/"
-    outputDir = "/mnt/md0/jaber/windowStat/"
+def getCaptureStartEndTime(inputDir):
+    # use the timestamp as seen in cicFl0owMeter cause we are directly working with cicS
     cnt = 0
+    minTime = pd.to_datetime("05/12/2025 08:15:00 PM")
+    maxTime=  pd.to_datetime("05/12/2000 08:15:00 PM")
     for root, dirs, files in os.walk(inputDir):
-        userFlows = []
         for file in files:
             if file.endswith(".csv"):
                 data = pd.read_csv(os.path.join(root, file))
-                userFlows.append(data)
-                pass
+                currentTime = pd.to_datetime(data['Timestamp'], format='%m/%d/%Y %I:%M:%S %p')[0]
+                minTime = min(currentTime, minTime)
+                maxTime = max(currentTime, maxTime)
+        print(root)
+        cnt += 1
+        print(cnt)
+        if cnt  > 100:
+            break
+
+    print(f'minimum time is {minTime}')
+    print(f'maximum time is {maxTime}')
+    return (minTime, maxTime)
+
+def feedUsersForTrafficPatter(inputDir, outputDir):
+    captureStartTime = "2022-05-12 8:15:00 PM"
+    captureStartTime= pd.to_datetime(captureStartTime)
+
+    captureDuration = 15 * 60 # in seconds
+    # read all files in the directory and put them in a list
+    inputDir = "/mnt/md0/jaber/groupedCIC/"
+    outputDir = "/mnt/md0/jaber/groupedUserBehavior/"
+    cnt = 0
+    argList = []
+    for root, dirs, files in os.walk(inputDir):
         print(root)
         cnt+=1
         print(cnt)
-        if userFlows != []:
-            userFlows = pd.concat(userFlows)
-            flowStat(userFlows, outputDir ,captureStartTime, captureDuration)
-            
+        argList.append((root, outputDir,captureStartTime,captureDuration))
 
-#flowStat(userFlows, outputDir ,captureStartTime, captureDuration)
+    _paralell_process(userTrafficPattern, argList)
+
+    argList = []
+
+
+
+
+if __name__ == '__main__':
+    # Get start time and capture duration from here and use it in feedUsersForT
+    # mintime , maxtime = getCaptureStartEndTime( "/mnt/md0/jaber/groupedCIC/")
+    # use the timestamp as seen in cicFl0owMeter cause we are directly working with CICs
+    print("here")
+
+    feedUsersForTrafficPatter("/mnt/md0/jaber/groupedCIC/", "/mnt/md0/jaber/groupedUserBehavior/")
+    # userTrafficPattern(userFlows, outputDir )
 
