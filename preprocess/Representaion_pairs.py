@@ -115,10 +115,10 @@ def combineSameUserFlows(userFlows):
             if len(flows) < 2:
                 continue
 
-            if len(flows) <= 150:
+            if len(flows) <= 65:
                 selected_flows = flows
             else:
-                selected_flows = random.sample(flows, 150)
+                selected_flows = random.sample(flows, 65)
             pairs = list(combinations(selected_flows, 2))
             # Labeling pairs as 1
             pairs = [(p[0], p[1], 1) for p in pairs]
@@ -218,7 +218,9 @@ def checkParisDistribution(groupingsJson):
         print(user)
         cnt+=1
         print(cnt)
-        if cnt>1000:
+        if len(flows) > 500:
+            continue
+        if cnt>3000:
             break
         services = []
         # Count the number of flows with label 1
@@ -226,8 +228,8 @@ def checkParisDistribution(groupingsJson):
             services.append(findService(item))
         unique_pairs = {(port, ip) for port, ip in services}
         unique_ports = {port for port, ip in services}
-        ServicesPerUser[user] = (list(unique_ports),list(unique_pairs), len(userFlows[user]))
-    with open("ServicesPerUser1000Users.json", "w") as jsonfile:
+        ServicesPerUser[user] = (list(unique_ports),list(unique_pairs), len(flows))
+    with open("ServicesPerUser3000Users.json", "w") as jsonfile:
         json.dump(ServicesPerUser,jsonfile)
 
     portNum =[]
@@ -257,9 +259,9 @@ def checkParisDistribution(groupingsJson):
 if __name__ == "__main__":
     # df= pd.read_csv('TopUsers.csv')
     # print("here")
-    file = open("groupings.json")
-    userFlows = json.load(file)
-    userFlowStats(userFlows)
+    # file = open("groupings.json")
+    # userFlows = json.load(file)
+    # userFlowStats(userFlows)
     # combineSameUserFlows(userFlows)
     # file = open("CombinedPairs6Flows.json")
     # flowPairs = json.load(file)
@@ -270,4 +272,34 @@ if __name__ == "__main__":
     # process.rlimit(psutil.RLIMIT_AS, (soft_limit_bytes, psutil.RLIM_INFINITY))
     # feedParallelDataset("/home/jaber/TrueDetective/CombinedPairsParallel/")
 #    createDatasetFromFlows("/home/jaber/TrueDetective/CombinedPairsParallel/1.json")
-    # checkParisDistribution("/home/jaber/TrueDetective/preprocess/groupings.json")
+    checkParisDistribution("/home/jaber/TrueDetective/preprocess/groupings.json") 
+    file = open("ServicesPerUser3000Users.json")
+    ServicesPerUser = json.load(file)
+    portFreq = {}
+    portNum= []
+    serviceNum =[]
+    userFlowLength= []
+    for user , stats in ServicesPerUser.items():
+        portNum.append(len(stats[0]))
+        serviceNum.append(len(stats[1]))
+        userFlowLength.append(stats[2])
+        for port in stats[0]:
+            if port in portFreq:
+                portFreq[port] += 1
+            else:
+                portFreq[port] = 1
+
+    import statistics
+    print(f'average port {statistics.mean(portNum)}')
+    print(max(portNum))
+    print(min(portNum))
+    print(statistics.median(portNum))
+    print(f'average service {statistics.mean(serviceNum)}')
+    print(max(serviceNum))
+    print(min(serviceNum))
+    print(statistics.median(serviceNum))
+    print(f'average flows per user {statistics.mean(userFlowLength)}')
+    print(max(userFlowLength))
+    print(min(userFlowLength))
+    print(statistics.median(userFlowLength))
+    print(portFreq)
