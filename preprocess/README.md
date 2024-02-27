@@ -14,3 +14,18 @@ docker run -v /home/jaber/new15min/s2f1/:/tmp/server_ndt -v /home/jaber/cic:/tmp
 
 ### Split large pcap:
 tcpdump -r "input" -w "output" -C 10
+
+### For installing nprint on docker
+* install g++ first 
+* install build-essential 
+* Then the rest would work fine 
+
+### For installing tranalyzer
+* The regular source ~/.bashrc does not work if you want to 
+run the command from python or shell script (however it works with command line)
+* Find the location of tranalyzer by sudo find / -type f -name tranalyzer
+* It will be in the same folder of unzipped tranalyzer 
+* Then, add it to the path by editing ~/.bashrc:
+  * export PATH=$PATH:/home/jaber/tranalyzer2-0.9.0/tranalyzer2/build/
+  * source ~/.bashrc
+
