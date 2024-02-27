@@ -99,6 +99,7 @@ def trainTestDifferentModels(datasetFile):
     X_train = sc.fit_transform(X_train)
     X_test = sc.transform(X_test)
 
+    models = []
     # print("Feature scaling done")
     # clf = RandomForestClassifier(n_estimators=100)
     # clf.fit(X_train, y_train)
@@ -123,10 +124,10 @@ def trainTestDifferentModels(datasetFile):
     # models.append(DT)
     # # 91.5
     #
-    # print("K Nearest Neighbor")
-    # KNN = KNeighborsClassifier(n_neighbors = 5, metric = 'minkowski', p = 2)
-    # models.append(KNN)
-    # #78
+    print("K Nearest Neighbor")
+    KNN = KNeighborsClassifier(n_neighbors = 5, metric = 'minkowski', p = 2)
+    models.append(KNN)
+    #78
     #
     # # print("Kernel SVM")
     # # Support = SVC(kernel = 'rbf', random_state = 0)
@@ -135,61 +136,63 @@ def trainTestDifferentModels(datasetFile):
     # print("Logistic Regression")
     # LR = LogisticRegression(random_state = 0, max_iter=10000)
     # models.append(LR)
-    # # 59
-    #
+    # 59
+
     # print("Naive Bayes")
     # NB = GaussianNB()
     # models.append(NB)
     # # # 51.4
     #
-    models = []
-    print("Random Forest")
-    RF = RandomForestClassifier(n_estimators = 10, criterion = 'entropy', random_state = 0)
-    models.append(RF)
+    # models = []
+    # print("Random Forest")
+    # RF = RandomForestClassifier(n_estimators = 10, criterion = 'entropy', random_state = 0)
+    # models.append(RF)
     # # 96.6
     # #
     # # print("SVM")
     # # svm = SVC(kernel = 'linear', random_state = 0)
     # # models.append(svm)
     #
-    outputFilename = datasetFile.split('/')[-1]
-    result = open(f'/mnt/md0/jaber/{outputFilename}.txt', "w")
+    # outputFilename = datasetFile.split('/')[-1]
+    # result = open(f'/mnt/md0/jaber/{outputFilename}.txt', "w")
     for item in models:
         print(item)
-        result.write(f'{item}\n')
+        # result.write(f'{item}\n')
         item.fit(X_train, y_train)
         y_pred = item.predict(X_test)
-        # cm = confusion_matrix(y_test, y_pred)
-        # print(cm)
-        feature_importances = item.feature_importances_
-
-        # Get the indices of features sorted by importance
-        sorted_indices = np.argsort(feature_importances)[::-1]
-
-        # Print the feature ranking
-        print("Feature ranking:")
-        for i, feature_index in enumerate(sorted_indices):
-
-            print(f"{i + 1}. Feature {feature_index} ({dataset.columns.tolist()[feature_index]}): {feature_importances[feature_index]}")
-            result.write(f"{i + 1}. Feature {feature_index} ({dataset.columns.tolist()[feature_index]}): {feature_importances[feature_index]}\n")
-            if i > 20:
-                break
-
         cm = confusion_matrix(y_test, y_pred)
-        print(f'confusion matrix:\n {cm}')
-        result.write(f'confusion matrix:\n {cm}')
+        print(cm)
         print("Test accuracy")
         print(accuracy_score(y_test, y_pred))
-        result.write(f'Test accuracy:\n{accuracy_score(y_test, y_pred)}\n')
+        #feature_importances = item.feature_importances_
+
+        # # Get the indices of features sorted by importance
+        # sorted_indices = np.argsort(feature_importances)[::-1]
+        #
+        # # Print the feature ranking
+        # print("Feature ranking:")
+        # for i, feature_index in enumerate(sorted_indices):
+        #
+        #     print(f"{i + 1}. Feature {feature_index} ({dataset.columns.tolist()[feature_index]}): {feature_importances[feature_index]}")
+        #     result.write(f"{i + 1}. Feature {feature_index} ({dataset.columns.tolist()[feature_index]}): {feature_importances[feature_index]}\n")
+        #     if i > 20:
+        #         break
+        #
+        # cm = confusion_matrix(y_test, y_pred)
+        # print(f'confusion matrix:\n {cm}')
+        # result.write(f'confusion matrix:\n {cm}')
+        # print("Test accuracy")
+        # print(accuracy_score(y_test, y_pred))
+        # result.write(f'Test accuracy:\n{accuracy_score(y_test, y_pred)}\n')
         print("Train accuracy:")
         print(accuracy_score(y_train, item.predict(X_train)))
-        result.write(f'Test accuracy:\n{accuracy_score(y_train, item.predict(X_train))}\n')
-        result.close()
+        # result.write(f'Test accuracy:\n{accuracy_score(y_train, item.predict(X_train))}\n')
+        # result.close()
 
 
 if __name__ == "__main__":
-    for subdir, dirs, files in os.walk('/mnt/md0/jaber/MoreDatasets/'):
-        for file in files:
-            if file.endswith(".csv"):
-                trainTestDifferentModels(subdir + file)
-    # trainTestDifferentModels('/mnt/md0/jaber/datasets/5_1000.json_FullCombination.csv')
+    # for subdir, dirs, files in os.walk('/mnt/md0/jaber/MoreDatasets/'):
+    #     for file in files:
+    #         if file.endswith(".csv"):
+    #             trainTestDifferentModels(subdir + file)
+    trainTestDifferentModels('/mnt/md0/jaber/datasets/5_1000.json_FullCombination.csv')
