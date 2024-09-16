@@ -31,7 +31,6 @@ for filed in FieldsToDrop:
         if filed in col:
             columns_to_drop.append(col)
 dataset.drop(columns=columns_to_drop, inplace= True)
-
 X = dataset.iloc[:, :-1].values
 y = dataset.iloc[:, -1].values
 
