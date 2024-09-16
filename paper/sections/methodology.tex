@@ -1,0 +1,110 @@
+\section{Methodology}
+\begin{enumerate}
+    \item Taking all the traffic to the box (gre tunnel)
+    \item Routing the traffic through the shaper (veth) for upstream
+    \item Performing NAT and dissecting NAT
+    \item Routing unNATed traffic through shaper for downstream shaping
+    \item Routing back traffic to the clients through gre tunnel 
+\end{enumerate}
+
+\begin{enumerate}
+    \item Ethernet to namespace 1 
+    \item Namespace 1 to namespace 2 through shaper
+    \item Namespace 2 to the NAT 
+    \item NAT to the Ethernet (second one)
+    \item Reverse of all these steps
+\end{enumerate}
+
+Counting the users behind a NAT is a subproblem for detecting the users behind the NAT. When we can classify the users, counting the users is just counting the number of clusters. Same for detecting the existence of NAT, when classification detects only one cluster, we can say there is no NAT in place or we can say there is a 1 to 1 mapping between IP addresses. Therefore, for the rest of paper, we only tackle user classification problem which encompasses the other two use cases. 
+
+There are two ways to tackle user problem. One method is giving the entire traffic and flows as input to the system and then classifying the users based on the entire flows/packets belonging to the same users. The other way is that comparing to flows one by one and deciding whether these two flows belong to the same user or not. We argue that the second approach is better in terms of required training dataset size. Imagine we captured data for 1 hours of n users, each have on average k flows. In the former case, we have only n samples in our dataset and each sample is labeled with a unique ID which would be the user ID; In the latter case, we would have the following number of samples in the dataset:
+\begin{itemize}
+    \item Samples of flows belonging to the same user: $n * {k \choose 2}$
+    \item Samples of flows belonging to the different users: $\frac{n*(n-1)}{2} * k^2 $
+\end{itemize}
+
+Even if we decide to have a balanced dataset and have the same number of samples from both, our dataset size would be almost $n*k^2$ which is much larger than $n$ and gives better opportunity to the model to learn the patterns based on the same raw input data. Once we have realized which flows are from the same user and which flows are not, we can cluster the flows into different groups where each group represents a user. 
+
+\subsection{Data preprocessing}
+We had access to UCSB gateway data where the user traffic was not NATted due to big range of IP addresses we have at UCSB. So, it was straightrait forwoard for us to capture huge dataset which is already labeled. We just needed to separate the users based on the internal IP address of the packets (either src or destiantion belong to a specific user). For this paper, we used pcapsplitter to separate all the flows from each other. Then, we used CICFlowMetere to get the data related to the flows like the number of packets, bytes, flow duration, inter arrival time etc. After that, we grouped the flows (both CICFlowMetere and the pcaps) based on the internal IP address of the packets.
+
+One thing we did before identifying the flows was removing every flow with less than 3 packets. These short flows are not useful for our classification problem as they do not have enough information to be classified. Besides that, they are usually bots scanning the network or some other malicious activities or unsuccesful connections.
+
+After that, we created another column called userLabel which is the internal IP address of the flows and remvoed the source/destination IP address columns. We also removed the columns which are not useful for our classification problem like checksum and IP version. After that, we chose the number of flows per user based on the mean and median of the number of flows per user. We sampled 20 flows per user and then combined them with each other and with the flows from other users. The two flows belong to the same user is labelled as one, and it would be zero otherwise. We used weighted random selection to select the flows from other users.  
+
+We considered 3 different representations for the flows:
+\begin{itemize}
+    \item Using cicFlowMeter only
+    \item Using npring only (first 5 packets of flow)
+    \item Using cicFlowMeter and several first packets of the flow \
+    \item Maybe: packet level information, flow level information and user behvior 
+\end{itemize}
+
+\subsection{TDUserMeter}
+We developed a tool call True Detective User Meter (TDUserMeter) which analyases the user behavior based on the flows. This tool takes all the CICFlowmeter output for all of the flows of the user in a period of time (eg one hour) and calculates differnet features which would help distinguish the users from each other. The features we used are as follows:
+% make the width equal to the text width
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Feature} & \textbf{Description} \\ \hline
+TotalFlowDuration & Total duration of the flows \\ \hline
+MinFlowDuration & Minimum duration of the flows \\ \hline
+MaxFlowDuration & Maximum duration of the flows \\ \hline
+AvgFlowDuration & Average duration of the flows \\ \hline
+StdFlowDuration & Standard deviation of the duration of the flows \\ \hline
+totalPackets & Total number of packets in the flows \\ \hline
+minPackets & Minimum number of packets in the flows \\ \hline
+maxPackets & Maximum number of packets in the flows \\ \hline
+avgPackets & Average number of packets in the flows \\ \hline
+stdPackets & Standard deviation of the number of packets in the flows \\ \hline
+totalBwdPackets & Total number of packets in the backward direction of the flows \\ \hline
+minBwdPackets & Minimum number of packets in the backward direction of the flows \\ \hline
+maxBwdPackets & Maximum number of packets in the backward direction of the flows \\ \hline
+avgBwdPackets & Average number of packets in the backward direction of the flows \\ \hline
+stdBwdPackets & Standard deviation of the number of packets in the backward direction of the flows \\ \hline
+totalFwdBytes & Total number of bytes in the forward direction of the flows \\ \hline
+minFwdBytes & Minimum number of bytes in the forward direction of the flows \\ \hline
+maxFwdBytes & Maximum number of bytes in the forward direction of the flows \\ \hline
+avgFwdBytes & Average number of bytes in the forward direction of the flows \\ \hline
+stdFwdBytes & Standard deviation of the number of bytes in the forward direction of the flows \\ \hline
+totalBwdBytes & Total number of bytes in the backward direction of the flows \\ \hline
+minBwdBytes & Minimum number of bytes in the backward direction of the flows \\ \hline
+maxBwdBytes & Maximum number of bytes in the backward direction of the flows \\ \hline
+avgBwdBytes & Average number of bytes in the backward direction of the flows \\ \hline
+stdBwdBytes & Standard deviation of the number of bytes in the backward direction of the flows \\ \hline
+totalBytes & Total number of bytes in the flows \\ \hline
+distinctSrcPorts & Number of distinct source ports in the flows \\ \hline
+distinctDstPorts & Number of distinct destination ports in the flows \\ \hline
+distinctDstIP & Number of distinct destination IP addresses in the flows \\ \hline
+totalFlows & Total number of flows \\ \hline
+minFwdPacketLen & Minimum length of the packets in the forward direction of the flows \\ \hline
+maxFwdPacketLen & Maximum length of the packets in the forward direction of the flows \\ \hline
+avgFwdPacketLen & Average length of the packets in the forward direction of the flows \\ \hline
+stdFwdPacketLen & Standard deviation of the length of the packets in the forward direction of the flows \\ \hline
+minBwdPacketLen & Minimum length of the packets in the backward direction of the flows \\ \hline
+maxBwdPacketLen & Maximum length of the packets in the backward direction of the flows \\ \hline
+avgBwdPacketLen & Average length of the packets in the backward direction of the flows \\ \hline
+stdBwdPacketLen & Standard deviation of the length of the packets in the backward direction of the flows \\ \hline
+minDownUpRatio & Minimum down/up ratio of the flows \\ \hline
+maxDownUpRatio & Maximum down/up ratio of the flows \\ \hline
+avgDownUpRatio & Average down/up ratio of the flows \\ \hline
+stdDownUpRatio & Standard deviation of the down/up ratio of the flows \\ \hline
+minFlowIAT & Minimum inter arrival time of the flows \\ \hline
+maxFlowIAT & Maximum inter arrival time of the flows \\ \hline
+avgFlowIAT & Average inter arrival time of the flows \\ \hline
+stdFlowIAT & Standard deviation of the inter arrival time of the flows \\ \hline
+minIdleTime & Minimum idle time of the flows \\ \hline
+maxIdleTime & Maximum idle time of the flows \\ \hline
+totalIdleTime & Total idle time of the flows \\ \hline
+stdIdleTime & Standard deviation of the idle time of the flows \\ \hline
+avgIdleTime & Average idle time of the flows \\ \hline
+totalTCPFlows & Total number of TCP flows \\ \hline
+totalUDPFlows & Total number of UDP flows \\ \hline
+UserIP & Internal IP address of the user \\ \hline
+\end{tabular}
+\caption{Features extracted by TDUserMeter}
+
+
+\end{table}

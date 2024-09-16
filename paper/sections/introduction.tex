@@ -1,0 +1,92 @@
+\section{Introduction}\label{sec:intro}
+
+\begin{enumerate}
+    \item What is the problem (considering the encryption)
+    \item Why it is important
+    \item How are we going to address this 
+\end{enumerate}
+
+Network Address Translation (NAT) aimed originally at resolving the issue of IPv4 address exhaustion. NAT allows multiple devices on a local network to share a single public IP address. This enables efficient utilization of the limited number of public IP addresses and allows devices on a local network to connect to the internet. NAT also provides some privacy benefits.
+
+NAT can lead to communication problems, security vulnerabilities, difficulties in network management, and challenges in identifying network issues. it can also be taken advantage of by malicious users hiding behind NAT devices. Thus, identifying NAT devices and hosts behind them is essential to detect malicious behaviors in traffic and application usage 
+
+ In the case of security, NAT devices can hide hosts connected to them, thus a host behind a NAT can perform malicious behavior without being detected [7, 8]. Furthermore, a NAT device can be installed in an intranet thus allowing unauthorized hosts access to the network and causing a shadow IT issue
+
+ Also, nowadays, ISP, while providing Internet connectivity to
+users, offers services based on the number of active connections
+(apart from other bandwidth-based plans). In case
+of the number of active user-based connections (e.g., ten
+active uses max), ISP needs to know the number of active
+users behind NAT to ensure that they do not cross the paid
+user connection quota. In such scenarios, counting of host
+is essential.
+Mobile hotspots implement NAT as well. In the rest of this paper, the term NAT refers to a router, tethering device, or a mobile hotspot while a NATted network refers to the internal network behind the NAT.
+
+How Polynomial Regression Improves DeNATing
+
+other applications like streaming server also
+require host count to serve its users better, as the server
+offer limited user connection due to server overload.
+
+
+
+To tackle this issue, transfer learning was applied to enhance the model's efficiency and effectiveness
+% To tackle this issue, transfer learning was applied to enhance the model's efficiency and effectiveness
+% using XGboost
+% Rui et al: Is there a nat or not
+% Yan et al: based on app level 
+% Khatouni et al: our approch, check more 
+% Generalizability in the case of obfuscation? Reem Nassar et al
+% In our case we can easily remove the obfustcation features and see the result. 
+% Two papers of Reem Nassar et al: We are considering some features that they are not considering. The other thing is dataset generation method (we have single vantage point ). They use a feature vector of several flow statistics and several window statistics and statistics of a time window. Not packet level data. The feature vector has an ordinary host and a host behind the NAT. This dataset contains network traffic that is double-NATed thus replicating the scenario of shadow IT in an enterprise context. Network traffic in this dataset was collected over the course of two weeks with three sessions each day (morning, midday, and evening). Each session consists of 7 tests tackling different number of devices (up to 4 devices) at a time resulting in a total of 294 tests (294 capture files). They do not consider IP packets ---> It reduced the accuracy by 4 percent in my case . Also, how to apply the window stat in the wild when caputring the data? It is for home network mostly rather than largescale and so prone to shortcuts 
+% Should I delete the port numbers? 
+
+
+\subsection{Current issues}
+No application level information -> encrypted traffic, privacy etc, also more like OS/Application fingerprinting. Some works just consider the existence of NAT. 
+
+
+we eliminate the issue of highly active user skewing the dataset by down sampling (n flows per user)
+
+Our dataset already consists of wired and wireless users 
+
+Consider removig port??? If it creates bias based on NAT implementation
+
+Considering tranalyzer 
+
+
+
+
+
+\subsection{Removing shortcuts}
+more users better data, the accuracy decreases by adding more users cause it reduces the shortcuts effect, trustee, removing the parameters that changes in different network conditions (eg TTL), 
+
+
+seq number can be meaningful specially the last bytes and after that it is src/dst port 
+
+we can consider flow start time and end time as part of cic: how to input those values? 
+
+
+TODO: Use dataset with malicious users behind the nat to count the number of hosts
+
+TODO: use tranalyzer, separate the flags, combine tranalyzer with cicflowmeter
+
+TODO: should we consider separate solution for UDP and TCP? 
+
+TODO: uses classes for destination port (port outside ucsb)
+
+TODO: Should I remove traffic related to the services at UCSB like the web server?
+
+TODO: What is tenfold cross validation
+
+TODO: Detecting malicoius behaviour based on user behaviour statistics and counting the number of malicious entities 
+
+TODO: Compute the training time with different models, compute the accuracy with different models
+
+TODO: NOT dorpping some of the packet fileds like IHL and total length 
+
+TODO: Here we are 
+
+
+\subsection{Contributions}
+add it here

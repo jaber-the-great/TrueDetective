@@ -1,0 +1,205 @@
+\documentclass[sigconf]{acmart}
+
+\usepackage{algpseudocode}
+\usepackage{pdflscape}
+\usepackage{xcolor}
+\usepackage{comment}
+\usepackage{float}
+\usepackage{balance}
+\usepackage{xspace}
+\usepackage{subcaption}
+\usepackage{multirow}
+\usepackage{placeins}
+\usepackage{placeins}
+\usepackage{cleveref}
+\hypersetup{citecolor = blue}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{enumitem}
+
+
+\usepackage[normalem]{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage[font=small,format=plain,labelfont=bf,textfont=it]{caption}
+\addtolength{\textfloatsep}{-0.15in}
+
+\makeatletter
+\def\input@path{{sections/}{./}}
+\makeatother
+
+
+\crefformat{section}{\S#2\color{blue}#1#3} % see manual of cleveref, section 8.2.1
+\crefformat{subsection}{\S#2\color{blue}#1#3}
+\crefformat{subsubsection}{\S#2#1#3}
+
+
+%%% Adding new line after subsubsection
+\makeatletter
+\def\subsubsection{\@startsection{subsubsection}{3}%  
+  \z@{.5\linespacing\@plus.7\linespacing}{.1\linespacing}%
+    {\normalfont\itshape}}
+    \makeatother
+
+\pgfsetarrows{latex-latex}
+\tikzset{%
+  base/.style = {inner sep=5pt,
+                 text centered,
+                 thin,
+                 font=\rmfamily},
+  round/.style = {base,
+                  rectangle,
+                  rounded corners=1ex,
+                  draw=black,
+                  fill=gray!20,
+                  minimum height=0.35in}
+}
+
+\settopmatter{printacmref=false} % Removes ACM reference format
+\renewcommand\footnotetextcopyrightpermission[1]{} % Removes footnote with conference info
+
+
+%%%%%%%%%% MACRO NAMES %%%%%%
+
+% Commands
+% --------
+\newcommand{\ndevices}{15\xspace}
+\newcommand{\rtpml}{RTP ML\xspace}
+\newcommand{\ipnonml}{IP/UDP Heuristic\xspace}
+\newcommand{\ipml}{IP/UDP ML\xspace}
+\newcommand{\rtpnonml}{RTP Heuristic\xspace}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+
+\setlength{\textfloatsep}{1pt}% Remove \textfloatsep
+
+\newcommand{\tarun}[1]{[\textcolor{blue}{\textit{Tarun: #1}}]}
+\newcommand{\irene}[1]{[\textcolor{orange}{\textit{Irene: #1}}]}
+\newcommand{\ag}[1]{[\textcolor{magenta}{\footnotesize\textit{Arpit: #1}}]}
+\newcommand{\meet}{Meet\xspace}
+\newcommand{\teams}{Teams\xspace}
+\newcommand{\webex}{Webex\xspace}
+\newcommand{\junchen}[1]{[\textcolor{red}{\textit{\footnotesize{Junchen: #1}}}]}
+\newcommand{\taveesh}[1]{[\textcolor{purple}{\textit{\footnotesize{Taveesh: #1}}}]}
+
+
+
+%\newcommand{\rev}[2]{\sout{#1}\textcolor{blue}{#2}}
+%Accept revisions
+\newcommand{\rev}[2]{{#2}}
+
+%%%%%%%%%%%%%%%%%%%%  SPACE SAVINGS %%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage[all=normal,wordspacing]{savetrees}
+
+\renewcommand{\paragraph}[1]{\vspace*{0.03in}\noindent\textbf{#1}}
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%% Rights management information.  This information is sent to you
+%% when you complete the rights form.  These commands have SAMPLE
+%% values in them; it is your responsibility as an author to replace
+%% the commands and values with those provided to you when you
+%% complete the rights form.
+% \setcopyright{acmcopyright}
+% \copyrightyear{2018}
+% \acmYear{2018}
+% \acmDOI{XXXXXXX.XXXXXXX}
+
+%% These commands are for a PROCEEDINGS abstract or paper.
+% \acmConference[Conference acronym 'XX]{Make sure to enter the correct
+%   conference title from your rights confirmation emai}{June 03--05,
+%   2018}{Woodstock, NY}
+%%
+%%  Uncomment \acmBooktitle if the title of the proceedings is different
+%%  from ``Proceedings of ...''!
+%%
+%%\acmBooktitle{Woodstock '18: ACM Symposium on Neural Gaze Detection,
+%%  June 03--05, 2018, Woodstock, NY}
+\acmPrice{15.00}
+\acmISBN{978-1-4503-XXXX-X/18/06}
+
+
+
+
+
+%%
+%% end of the preamble, start of the body of the document source.
+\begin{document}
+
+%%
+%% The "title" command has an optional parameter,
+%% allowing the author to define a "short title" to be used in page headers.
+\title{TrueDetective: Detecting users behind NAT by analyzing the encrypted traffic}
+
+
+\author{Jaber Daneshamooz}
+% \authornote{Both authors contributed equally to this research.}
+\email{jaber@ucsb.edu}
+% \orcid{1234-5678-9012}
+% \author{G.K.M. Tobin}
+% \authornotemark[1]
+% \email{webmaster@marysville-ohio.com}
+\affiliation{%
+  \institution{University of California, Santa Barbara}
+  % \streetaddress{P.O. Box 1212}
+  \city{Santa Barbara}
+  \state{California}
+  \country{USA}
+  \postcode{93106}
+}
+
+
+
+
+
+
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Jaber et al.}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\input{abstract}
+
+
+
+
+%%
+%% This command processes the author and affiliation and title
+%% information and builds the first part of the formatted document.
+\maketitle
+% \input{abstract}
+\input{introduction}
+\input{background}
+\input{methodology}
+\input{netReplica}
+\input{evaluation}
+\input{study}
+\input{related}
+\input{discussion}
+\input{conclusion}
+
+\begin{acks}
+To Robert, for the bagels and explaining CMYK and color spaces.
+\end{acks}
+
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{paper}
+
+\end{document}
+\endinput
+%%
+%% End of file `sample-sigconf.tex'.

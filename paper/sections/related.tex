@@ -1,0 +1,87 @@
+\section{Related Work}\label{sec:related}
+
+\subsection{Identifcation and Counting of Hosts Behind NAT Using Machine
+Learning \cite{shukla2022identification}}
+In this, we use ICS data set to train our model which contains traffic flow from 1116 hosts. We identify each host with
+the help of source IP address and mark them as a unique
+class. Once classes are assigned to each fow, we train our
+model with the help of ICS data set. After training our data
+model, we have used diferent data sets which contains NATted trafc flow from multiple hosts to test our trained model.
+Our trained model then classifes each fow to a class with
+the help of all the selected features. Unique classes are then
+counted to count number of hosts.
+
+How long the duraiong of ICS dataset? is 400MB enough? It had 460K flows, not natted
+
+The second dataset, MTA: 143 hosts, natted, and non natted
+The third dataset, their own, 73 PC hosts 6 hours, natted and non natted, only web, running a script 
+The test 
+
+The paper relies heavily on reference 17 for choice of flow analayzer, choice of filtering method 
+
+Much different featurs than us, we are getting mostly the inter-arrival time and flow based stats while the paper gets mostliy thibngs related to window size and ACks. 
+ALso, they only not consider src port, but destination port is considered. 
+
+Do they consider UDP packets? Their most important features are tcp
+
+Why not considering all the features and then eliminating shortcuts?
+They also had to reduce the number of features and it improved the preformance --> maybe they did not have large enough dataset --> their dataset size is equal to number of flows but ours can be as big is n chose 2 (half of n squared): They use multiclass calssifier 
+
+It redifines some ML stuff to just fill out the paper 
+
+They got 98 percent accuracy when test and train performed on ICS dataset, it is a shortcut though, accuracy dropped to 89 on lab dataset 
+
+
+
+IMPORTANT: Tranalayser considers the IAT 
+
+\subsection{Identifying NAT Devices to Detect Shadow IT: A Machine Learning Approach \cite{nassar2021identifying}}
+
+
+
+
+\subsection{A Generalizable Machine Learning Model for NAT
+Detection \cite{nassar2023generalizable}}
+Based on their previous work, it is just detecting the existences of NAT, not complete set of features, users transfer learning, not a good dataset 
+
+
+
+\subsection{Exploring nat detection and host identification using machine learning \cite{khatouni2019exploring}}
+
+check this paper: Integrating machine learning
+with off-the-shelf traffic flow features for http/https traffic classification,
+
+Also based on this paper, tranalyzer had the best preformance 
+
+
+\subsection{How Polynomial Regression Improves DeNATing \cite{adler2023polynomial}}
+The refrences one to 9: check them all
+
+The main ID of using IPID sucks: One is because of concurrent connections, it weould not get increamented but it would increase a lot in time, the other thing is DNS resovler in the network behind NAT and also DNS caching 
+
+It is TCP/IP based, what about UDP 
+
+Identifying packets belong to the same flow using TCP timestamp: Isn't it already solved by 4 tuples using pcapsplitter or cicflow?
+
+
+Assumption about IP IP assignmet by increameing it for each packet either per flow or globally
+
+They use TTL that can be a shortcut, but what about different devices use differnt Initial TTL: This can be a good info 
+
+Check the TCP window Scale size 
+
+OS fingerprinting using TCP/IP header fileds 
+
+Communication with speficif domains for OS fingerprinting (ref 15)
+
+check netflow records 
+
+Check Timestamp filed and the two studies based on timestamp
+
+In old versions of Windows OS, the IP-ID field was
+implemented as a simple counter. Newer versions use separate
+counters per destination address. IOS assigns a random number
+to IP-ID, and some versions of Linux always set it to zero.
+
+The IP-ID method requires long time of catpuring data cause for creating sequence I guess they need more than several DNS requests. Also, how precies is that?
+

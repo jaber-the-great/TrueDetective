@@ -1,0 +1,101 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{5}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{}, \showDOI{}, and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showDOI}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showDOI #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showDOI      \undefined \def \showDOI       #1{#1}\fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[Adler et~al\mbox{.}(2023)]%
+        {adler2023polynomial}
+\bibfield{author}{\bibinfo{person}{Ari Adler}, \bibinfo{person}{Lior Bass},
+  \bibinfo{person}{Yuval Elovici}, {and} \bibinfo{person}{Rami Puzis}.}
+  \bibinfo{year}{2023}\natexlab{}.
+\newblock \bibinfo{title}{How Polynomial Regression Improves DeNATing}.
+\newblock \bibinfo{howpublished}{IEEE Transactions on Network and Service
+  Management, IEEE}.
+\newblock
+
+
+\bibitem[Khatouni et~al\mbox{.}(2019)]%
+        {khatouni2019exploring}
+\bibfield{author}{\bibinfo{person}{Ali~Safari Khatouni}, \bibinfo{person}{Lan
+  Zhang}, \bibinfo{person}{Khurram Aziz}, \bibinfo{person}{Ibrahim Zincir},
+  {and} \bibinfo{person}{Nur Zincir-Heywood}.} \bibinfo{year}{2019}\natexlab{}.
+\newblock \bibinfo{title}{Exploring NAT Detection and Host Identification Using
+  Machine Learning}.
+\newblock \bibinfo{howpublished}{Presented at the 2019 15th International
+  Conference on Network and Service Management (CNSM), IEEE}. ,
+  \bibinfo{numpages}{8}~pages.
+\newblock
+
+
+\bibitem[Nassar et~al\mbox{.}(2021)]%
+        {nassar2021identifying}
+\bibfield{author}{\bibinfo{person}{Reem Nassar}, \bibinfo{person}{Imad Elhajj},
+  \bibinfo{person}{Ayman Kayssi}, {and} \bibinfo{person}{Samer Salam}.}
+  \bibinfo{year}{2021}\natexlab{}.
+\newblock \bibinfo{title}{Identifying NAT Devices to Detect Shadow IT: A
+  Machine Learning Approach}.
+\newblock \bibinfo{howpublished}{Presented at the 2021 IEEE/ACS 18th
+  International Conference on Computer Systems and Applications (AICCSA),
+  IEEE}. , \bibinfo{numpages}{7}~pages.
+\newblock
+
+
+\bibitem[Nassar et~al\mbox{.}(2023)]%
+        {nassar2023generalizable}
+\bibfield{author}{\bibinfo{person}{Reem Nassar}, \bibinfo{person}{Imad~H
+  Elhajj}, \bibinfo{person}{Ayman Kayssi}, {and} \bibinfo{person}{Samer
+  Salam}.} \bibinfo{year}{2023}\natexlab{}.
+\newblock \bibinfo{title}{A Generalizable Machine Learning Model for NAT
+  Detection}.
+\newblock \bibinfo{howpublished}{Presented at the 2023 International Conference
+  on Intelligent Computing, Communication, Networking and Services (ICCNS),
+  IEEE}. , \bibinfo{numpages}{44--49}~pages.
+\newblock
+
+
+\bibitem[Shukla and Gupta(2022)]%
+        {shukla2022identification}
+\bibfield{author}{\bibinfo{person}{Sanjeev Shukla} {and}
+  \bibinfo{person}{Himanshu Gupta}.} \bibinfo{year}{2022}\natexlab{}.
+\newblock \bibinfo{title}{Identification and Counting of Hosts Behind NAT Using
+  Machine Learning}.
+\newblock \bibinfo{howpublished}{SN Computer Science, Volume 3, Issue 2, Page
+  126, Springer}.
+\newblock
+
+
+\end{thebibliography}
