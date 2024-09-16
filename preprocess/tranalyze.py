@@ -13,8 +13,8 @@ def iterateAndRunTranlyzer(input_dir,outputDir):
                 user = subdir.split('/')[-1]
                 command = f'tranalyzer -r {subdir}/{file} -w {outputDir}/'
                 print(command)
-               # call(command)
-                subprocess.run('t2 -h')
+                call(command,shell=True)
+
                 if cnt > 2:
                     break
                 # Todo: create the output direcotry --> is it needed or it would automatically create
@@ -30,4 +30,4 @@ def _paralell_process(func, input_args, cores=0):
         return p.starmap(func, input_args)
 
 if __name__ == "__main__":
-    iterateAndRunTranlyzer('/mnt/md0/jaber/groupedPcap','/mnt/md0/jaber/groupedTranalyze')
+    iterateAndRunTranlyzer('/mnt/md0/jaber/nprintPcap/10','/mnt/md0/jaber/tran')
