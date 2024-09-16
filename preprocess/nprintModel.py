@@ -22,8 +22,8 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 #     dfs.append(df)
 # dataset =  pd.concat(dfs, ignore_index=True)
 
-dataset = pd.read_csv(f'/mnt/md0/jaber/mergedNprint/20NoRepetition.csv')
-datasetTest = pd.read_csv(f'/mnt/md0/jaber/mergedNprint/5UsersNoRepeatTest.csv')
+dataset = pd.read_csv(f'/mnt/md0/jaber/NprintServer4/5_1000_NORepeat.csv')
+#datasetTest = pd.read_csv(f'/mnt/md0/jaber/NprintServer4/20NoRepetition.csv')
 columns_to_drop = []
 dropls = []
 num_packets = 5
@@ -33,15 +33,15 @@ for filed in FieldsToDrop:
         if filed in col:
             columns_to_drop.append(col)
 dataset.drop(columns=columns_to_drop, inplace= True)
-datasetTest.drop(columns=columns_to_drop, inplace= True)
+# datasetTest.drop(columns=columns_to_drop, inplace= True)
 X = dataset.iloc[:, :-1].values
 y = dataset.iloc[:, -1].values
 
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
-X_train = X
-y_train = y
-X_test = datasetTest.iloc[:, :-1].values
-y_test = datasetTest.iloc[:, -1].values
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+# X_train = X
+# y_train = y
+# X_test = datasetTest.iloc[:, :-1].values
+# y_test = datasetTest.iloc[:, -1].values
 
 sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
