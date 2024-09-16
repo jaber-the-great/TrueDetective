@@ -40,6 +40,7 @@ def appendCICandheaders(cicFile, headersDir,  outputDir , numOfHeaderBytes ):
     for i in range(numOfHeaderBytes):
         name = "byte_" + str(i + 1)
         colNames.append(name)
+
     for subdir, dirs, files in os.walk(headersDir):
         for file in files:
             if file.endswith(".csv"):
@@ -52,7 +53,35 @@ def appendCICandheaders(cicFile, headersDir,  outputDir , numOfHeaderBytes ):
                     # print(headerFlowID)
                     row_to_append.to_csv( outputDir + str(headerFlowID) +  ".csv", index=False)
                 
-    
+
+
+
+def appendHeaderCICFiles(input_dir ,output_dir, numOfHeaderBytes):
+        
+    colNames = []
+    for i in range(numOfHeaderBytes):
+        name = "byte_" + str(i + 1)
+        colNames.append(name)
+    cnt = 0
+
+    for subdir, dirs, files in os.walk(input_dir):
+        cnt +=1
+        print(cnt)
+
+        for file in files:
+            try:
+                if file.endswith("pcap_Flow.csv"):
+                    cic = pd.read_csv(subdir + "/" + file)
+                    headerName = file.split('.')[0] + ".csv"
+                    header_file = pd.read_csv(subdir + "/" + headerName, header=None)
+                    cic = pd.concat([cic, pd.DataFrame(columns=colNames)])
+                    cic.loc[:, colNames] = list(header_file.iloc[0])
+                    SaveLoc = output_dir + subdir.split('/')[-1] + '/'
+                    os.makedirs(SaveLoc, exist_ok=True)
+
+                    cic.to_csv( SaveLoc +  file.split('.')[0] + ".merged.csv", index=False)
+            except:
+                print(f'Issue with file {file}')
 
 
 def feed_packets_appendCICandheaders(header_dir, cic_dir ,output_dir,numOfHeaderBytes):

@@ -1,0 +1,37 @@
+size    Iface   # flows    #flows After clean
+18G	s2f0	1,916,974	1,114,532
+16G	s2f1	1,262,360	650,498   
+17G	s2f2	1,340,102	687,542
+16G	s2f3	1,204,074	622,613
+16G	s3f0	1,450,457	853,168
+18G	s3f1	1,524,392	891,222
+15G	s3f2	1,254,405	646,862
+16G	s3f3	1,303,381	670,795
+
+
+
+
+Flows Per user:
+Mean: 143.7
+Median: 20
+STD: 533
+Min: 1
+Max: 44505
+Sum: 6,137.230
+Number of users: 42,703
+Total Pcap after cleaning: 109G
+Total Pcap before cleaning: 152G (due to the default size of pcaps)
+
+Flows per user after removing users with less than 5 flows:
+Mean: 232.7
+Median: 100
+STD: 664
+Sum: 6.111,270
+Number of users: 26,255
+Number of users with at least two flows: 32,729
+
+
+No Flow with IP options field 
+110 ICMP flows 
+
+Totoal flows with TCP/UDP header and at least 5 packets: 4,903,976 20G

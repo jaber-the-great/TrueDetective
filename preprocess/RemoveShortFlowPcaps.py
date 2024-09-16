@@ -14,6 +14,7 @@ def removePcaps(input_dir, numOfPackets):
 
                 pcapfile = subdir + '/' + file
                 output = subprocess.getoutput(f'tcpdump -r {pcapfile} 2>/dev/null | wc -l')
+                print(output)
                 if int(output) < numOfPackets:
                     output = subprocess.getoutput(f'rm {pcapfile}')
 
@@ -38,8 +39,19 @@ def _paralell_process(func, input_args, cores=0):
 
 
 if __name__ == "__main__":
-    pcapDir = "/home/jaber/TrueDetective/filteredPcaps"
-    minimumNumberOfPackets = 3
+    pcapDir = "/home/jaber/new15min/"
+#    dirs = ["s2f0", "s2f1", "s2f2", "s2f3", "s3f0", "s3f1", "s3f2", "s3f3"]
+    dirs = ['s3f0']
+    arg_list = []
+    for item in dirs:
+        lst = (pcapDir + item, 2)
+        arg_list.append(lst)
+
+    print(arg_list)
+#    _paralell_process(removePcaps, arg_list)
+    removePcaps(pcapDir+'s3f0',2)
+
+    minimumNumberOfPackets = 2
     #removePcaps(pcapDir, minimumNumberOfPackets)
-    feedPcaps(pcapDir, minimumNumberOfPackets)
+    #feedPcaps(pcapDir, minimumNumberOfPackets)
     # groupingPcapsforPP("a", "b")
