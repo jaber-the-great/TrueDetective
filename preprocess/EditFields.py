@@ -23,7 +23,7 @@ def short_hash_ip(ip_address):
     return short_hash
 
 def checkInternalIP(IP):
-    networks = ['128.111.0.0/16' ,  '169.231.0.0/16' , '192.150.216.0/23' , '92.35.222.0/24' , '199.120.153.0/24']
+    networks = ['128.111.0.0/16' ,  '169.231.0.0/16' , '192.150.216.0/23' , '192.35.222.0/24' , '199.120.153.0/24']
     for network in networks:
         if ipaddress.ip_address(IP) in ipaddress.ip_network(network):
             return True
