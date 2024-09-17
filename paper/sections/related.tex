@@ -33,16 +33,30 @@ They got 98 percent accuracy when test and train performed on ICS dataset, it is
 
 
 
+
 IMPORTANT: Tranalayser considers the IAT 
 
+Many of them use NetFlow dataset which is not a good one. 
+
 \subsection{Identifying NAT Devices to Detect Shadow IT: A Machine Learning Approach \cite{nassar2021identifying}}
+It's only a binray classification, whether there is a NAT or not.
+
+Instead of identifying NAT behavior based on the features extreacted from traffic traces per flow, it uses ML on aggregated flow features. Also, consider different window sizes for aggregating the flow features. They claim they reached accuracy of 96.9\% on their dataset which we believe it is due to shortcuts and spurious correlations. They claim that using the extractd featres from the flow resulted in high false positive rate; but we calim that although it might be true, it is not true when using correct set of featuers and the method that we have.  For example, if the algorithm is using TTL value as a feature to detect NAT, some NAT devices are deployed in a way that could not decrement the TTL (they mention it for pervious work). TTL can be useful in detecting NAT along the other features but solely relying on it is not a good idea. 
+While the paper claims that Aggregating features increase the classification accuracy because it increases the chance of having more than one active user, we showed that this method resulted in a very samll dataset and it is not a good idea. 
 
 
+The dataset issue; The dataset, “NAT Network Traffic Dataset”, is composed of 294 capture files from 294 tests done. It was collected over two weeks in June 2020, with three sessions per day. Each session, morning, midday, and evening, consists of 7 different tests done by varying the devices connected to the NAT router and the application opened by devices behind 
+NAT. Because of these issues and not having a realistic dataset to validate their model, we believe that their model is not generalizable and the reported accuracy is not reliable.
 
+This dataset is not big enough, is not diverse enough, and it is based on synthetic data. As a result, one obviouse issue is that the model uses average packets recieved and average bytes recieved as the main features to detect NAT. This is a shortcut and it is not a good idea.
 
 \subsection{A Generalizable Machine Learning Model for NAT
 Detection \cite{nassar2023generalizable}}
-Based on their previous work, it is just detecting the existences of NAT, not complete set of features, users transfer learning, not a good dataset 
+Same auther as \cite{nassar2021identifying}
+
+Based on their previous work, it is just detecting the existences of NAT, not complete set of features, users transfer learning, not a good dataset. Their passive setup has the same issue as the prvious dataset, it is not diverse enough, it is small and based on synthetic data.
+
+Outdated method, that used scapy instead of CICFlowMeter, it is slower and does not caputre all the features that we need. It uses limited set of features obtained from the packets and not the flows. They only consider 1 minutes of data, which is not enough. Because of these issues and not having a realistic dataset to validate their model, we believe that their model is not generalizable and the reported accuracy is not reliable.
 
 
 
@@ -51,7 +65,15 @@ Based on their previous work, it is just detecting the existences of NAT, not co
 check this paper: Integrating machine learning
 with off-the-shelf traffic flow features for http/https traffic classification,
 
-Also based on this paper, tranalyzer had the best preformance 
+Also based on this paper, tranalyzer had the best preformance. They used several tools, maybe breifly mention them. Spent most of the paper defining the F1 score, recall and precision which is not needed. They are also reporting 98 percent accuracy which is not reliable. No details about the dataset, 
+
+Poor dataset (figure 1 for create dataset). Not big enough (maybe), not diverse enough, based on synthetic data. They just mention 300GB of data with NAT and without NAT. 
+There are 16 hosts equipped with either Kali Linux Rolling4 or Microsoft Windows 7 Professional operating systems. Furthermore, there are two network configurations for the testbed set up: (i) Network with NAT; and (ii) Network without NAT. In the first configuration, each host is connected to a switch then these connections pass through a NAT and Dynamic Host Configuration Protocol (DHCP) server to access the public Internet. Used iMacros, which is synthetic data. 
+
+use limited number of features for training, only 8 of them, only works with tcp cause many of the main features are tcp related. Besides, it is not for detecting number of users behind the NAT, it just sasy whether there is a NAT or not.
+
+Not sure how they are using the flow level information, are they aggregating them or they assign every flow is behind a NAT or not? 
+
 
 
 \subsection{How Polynomial Regression Improves DeNATing \cite{adler2023polynomial}}
@@ -85,3 +107,7 @@ to IP-ID, and some versions of Linux always set it to zero.
 
 The IP-ID method requires long time of catpuring data cause for creating sequence I guess they need more than several DNS requests. Also, how precies is that?
 
+
+ntegrating machine learn- ing with off-the-shelf traffic flow features for http/https traffic classifica- tion,
+
+just http / https 

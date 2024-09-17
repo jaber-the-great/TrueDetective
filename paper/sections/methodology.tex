@@ -44,67 +44,73 @@ We considered 3 different representations for the flows:
 We developed a tool call True Detective User Meter (TDUserMeter) which analyases the user behavior based on the flows. This tool takes all the CICFlowmeter output for all of the flows of the user in a period of time (eg one hour) and calculates differnet features which would help distinguish the users from each other. The features we used are as follows:
 % make the width equal to the text width
 
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\textbf{Feature} & \textbf{Description} \\ \hline
-TotalFlowDuration & Total duration of the flows \\ \hline
-MinFlowDuration & Minimum duration of the flows \\ \hline
-MaxFlowDuration & Maximum duration of the flows \\ \hline
-AvgFlowDuration & Average duration of the flows \\ \hline
-StdFlowDuration & Standard deviation of the duration of the flows \\ \hline
-totalPackets & Total number of packets in the flows \\ \hline
-minPackets & Minimum number of packets in the flows \\ \hline
-maxPackets & Maximum number of packets in the flows \\ \hline
-avgPackets & Average number of packets in the flows \\ \hline
-stdPackets & Standard deviation of the number of packets in the flows \\ \hline
-totalBwdPackets & Total number of packets in the backward direction of the flows \\ \hline
-minBwdPackets & Minimum number of packets in the backward direction of the flows \\ \hline
-maxBwdPackets & Maximum number of packets in the backward direction of the flows \\ \hline
-avgBwdPackets & Average number of packets in the backward direction of the flows \\ \hline
-stdBwdPackets & Standard deviation of the number of packets in the backward direction of the flows \\ \hline
-totalFwdBytes & Total number of bytes in the forward direction of the flows \\ \hline
-minFwdBytes & Minimum number of bytes in the forward direction of the flows \\ \hline
-maxFwdBytes & Maximum number of bytes in the forward direction of the flows \\ \hline
-avgFwdBytes & Average number of bytes in the forward direction of the flows \\ \hline
-stdFwdBytes & Standard deviation of the number of bytes in the forward direction of the flows \\ \hline
-totalBwdBytes & Total number of bytes in the backward direction of the flows \\ \hline
-minBwdBytes & Minimum number of bytes in the backward direction of the flows \\ \hline
-maxBwdBytes & Maximum number of bytes in the backward direction of the flows \\ \hline
-avgBwdBytes & Average number of bytes in the backward direction of the flows \\ \hline
-stdBwdBytes & Standard deviation of the number of bytes in the backward direction of the flows \\ \hline
-totalBytes & Total number of bytes in the flows \\ \hline
-distinctSrcPorts & Number of distinct source ports in the flows \\ \hline
-distinctDstPorts & Number of distinct destination ports in the flows \\ \hline
-distinctDstIP & Number of distinct destination IP addresses in the flows \\ \hline
-totalFlows & Total number of flows \\ \hline
-minFwdPacketLen & Minimum length of the packets in the forward direction of the flows \\ \hline
-maxFwdPacketLen & Maximum length of the packets in the forward direction of the flows \\ \hline
-avgFwdPacketLen & Average length of the packets in the forward direction of the flows \\ \hline
-stdFwdPacketLen & Standard deviation of the length of the packets in the forward direction of the flows \\ \hline
-minBwdPacketLen & Minimum length of the packets in the backward direction of the flows \\ \hline
-maxBwdPacketLen & Maximum length of the packets in the backward direction of the flows \\ \hline
-avgBwdPacketLen & Average length of the packets in the backward direction of the flows \\ \hline
-stdBwdPacketLen & Standard deviation of the length of the packets in the backward direction of the flows \\ \hline
-minDownUpRatio & Minimum down/up ratio of the flows \\ \hline
-maxDownUpRatio & Maximum down/up ratio of the flows \\ \hline
-avgDownUpRatio & Average down/up ratio of the flows \\ \hline
-stdDownUpRatio & Standard deviation of the down/up ratio of the flows \\ \hline
-minFlowIAT & Minimum inter arrival time of the flows \\ \hline
-maxFlowIAT & Maximum inter arrival time of the flows \\ \hline
-avgFlowIAT & Average inter arrival time of the flows \\ \hline
-stdFlowIAT & Standard deviation of the inter arrival time of the flows \\ \hline
-minIdleTime & Minimum idle time of the flows \\ \hline
-maxIdleTime & Maximum idle time of the flows \\ \hline
-totalIdleTime & Total idle time of the flows \\ \hline
-stdIdleTime & Standard deviation of the idle time of the flows \\ \hline
-avgIdleTime & Average idle time of the flows \\ \hline
-totalTCPFlows & Total number of TCP flows \\ \hline
-totalUDPFlows & Total number of UDP flows \\ \hline
-UserIP & Internal IP address of the user \\ \hline
-\end{tabular}
-\caption{Features extracted by TDUserMeter}
+% % go to new page
+% \begin{table}[H]
+% \centering
+% \begin{tabular}{|l|l|}
+% \hline
+% \textbf{Feature} & \textbf{Description} \\ \hline
+% TotalFlowDuration & Total duration of the flows \\ \hline
+% MinFlowDuration & Minimum duration of the flows \\ \hline
+% MaxFlowDuration & Maximum duration of the flows \\ \hline
+% AvgFlowDuration & Average duration of the flows \\ \hline
+% StdFlowDuration & Standard deviation of the duration of the flows \\ \hline
+% totalPackets & Total number of packets in the flows \\ \hline
+% minPackets & Minimum number of packets in the flows \\ \hline
+% maxPackets & Maximum number of packets in the flows \\ \hline
+% avgPackets & Average number of packets in the flows \\ \hline
+% stdPackets & Standard deviation of the number of packets in the flows \\ \hline
+% totalBwdPackets & Total number of packets in the backward direction of the flows \\ \hline
+% minBwdPackets & Minimum number of packets in the backward direction of the flows \\ \hline
+% maxBwdPackets & Maximum number of packets in the backward direction of the flows \\ \hline
+% avgBwdPackets & Average number of packets in the backward direction of the flows \\ \hline
+% stdBwdPackets & Standard deviation of the number of packets in the backward direction of the flows \\ \hline
+% totalFwdBytes & Total number of bytes in the forward direction of the flows \\ \hline
+% minFwdBytes & Minimum number of bytes in the forward direction of the flows \\ \hline
+% maxFwdBytes & Maximum number of bytes in the forward direction of the flows \\ \hline
+% avgFwdBytes & Average number of bytes in the forward direction of the flows \\ \hline
+% stdFwdBytes & Standard deviation of the number of bytes in the forward direction of the flows \\ \hline
+% totalBwdBytes & Total number of bytes in the backward direction of the flows \\ \hline
+% minBwdBytes & Minimum number of bytes in the backward direction of the flows \\ \hline
+% maxBwdBytes & Maximum number of bytes in the backward direction of the flows \\ \hline
+% avgBwdBytes & Average number of bytes in the backward direction of the flows \\ \hline
+% stdBwdBytes & Standard deviation of the number of bytes in the backward direction of the flows \\ \hline
+% totalBytes & Total number of bytes in the flows \\ \hline
+% distinctSrcPorts & Number of distinct source ports in the flows \\ \hline
+% distinctDstPorts & Number of distinct destination ports in the flows \\ \hline
+% distinctDstIP & Number of distinct destination IP addresses in the flows \\ \hline
+% totalFlows & Total number of flows \\ \hline
+% minFwdPacketLen & Minimum length of the packets in the forward direction of the flows \\ \hline
+% maxFwdPacketLen & Maximum length of the packets in the forward direction of the flows \\ \hline
+% avgFwdPacketLen & Average length of the packets in the forward direction of the flows \\ \hline
+% stdFwdPacketLen & Standard deviation of the length of the packets in the forward direction of the flows \\ \hline
+% minBwdPacketLen & Minimum length of the packets in the backward direction of the flows \\ \hline
+% maxBwdPacketLen & Maximum length of the packets in the backward direction of the flows \\ \hline
+% avgBwdPacketLen & Average length of the packets in the backward direction of the flows \\ \hline
+% stdBwdPacketLen & Standard deviation of the length of the packets in the backward direction of the flows \\ \hline
+% minDownUpRatio & Minimum down/up ratio of the flows \\ \hline
+% maxDownUpRatio & Maximum down/up ratio of the flows \\ \hline
+% avgDownUpRatio & Average down/up ratio of the flows \\ \hline
+% stdDownUpRatio & Standard deviation of the down/up ratio of the flows \\ \hline
+% minFlowIAT & Minimum inter arrival time of the flows \\ \hline
+% maxFlowIAT & Maximum inter arrival time of the flows \\ \hline
+% avgFlowIAT & Average inter arrival time of the flows \\ \hline
+% stdFlowIAT & Standard deviation of the inter arrival time of the flows \\ \hline
+% minIdleTime & Minimum idle time of the flows \\ \hline
+% maxIdleTime & Maximum idle time of the flows \\ \hline
+% totalIdleTime & Total idle time of the flows \\ \hline
+% stdIdleTime & Standard deviation of the idle time of the flows \\ \hline
+% avgIdleTime & Average idle time of the flows \\ \hline
+% totalTCPFlows & Total number of TCP flows \\ \hline
+% totalUDPFlows & Total number of UDP flows \\ \hline
+% UserIP & Internal IP address of the user \\ \hline
+% \end{tabular}
+% \caption{Features extracted by TDUserMeter}
 
 
-\end{table}
+% \end{table}
+
+
+Our method does not require any interaction with end-users, respects their privacy, and is not limited to specific types of operating systems.
+
+IMPORTANT: Number of unique TTL value, and if TTL is different, it is definitely different users.

@@ -1,16 +1,16 @@
 # Fdb version 3
-["bibtex paper"] 1726508736 "paper.aux" "paper.bbl" "paper" 1726508740
+["bibtex paper"] 1726545908 "paper.aux" "paper.bbl" "paper" 1726545912
   "/usr/share/texlive/texmf-dist/bibtex/bst/acmart/ACM-Reference-Format.bst" 1638825809 90330 871e55fb6d8dc37a22e9e4941a79e593 ""
-  "paper.aux" 1726508739 5445 4407c9e3e9a891eefc409ff732046a97 "xelatex"
+  "paper.aux" 1726545911 4759 2cc35a740e20a41401f2588a0bf50a47 "xelatex"
   "paper.bib" 1726507646 1932 2590cf0c206e03d582c2026cb75636bc ""
   (generated)
   "paper.bbl"
   "paper.blg"
-["xdvipdfmx"] 1726508740 "paper.xdv" "paper.pdf" "paper" 1726508740
-  "paper.xdv" 1726508739 274060 25dcd670670fff981dd2f2f2f489c00c "xelatex"
+["xdvipdfmx"] 1726545911 "paper.xdv" "paper.pdf" "paper" 1726545912
+  "paper.xdv" 1726545911 264988 770af1cdc44fc0d4a26162723ddeb752 "xelatex"
   (generated)
   "paper.pdf"
-["xelatex"] 1726508736 "paper.tex" "paper.xdv" "paper" 1726508740
+["xelatex"] 1726545908 "paper.tex" "paper.xdv" "paper" 1726545912
   "/etc/texmf/web2c/texmf.cnf" 1725525181 475 c0e671620eb5563b2130f56340a5fde8 ""
   "/usr/share/texlive/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/zapfding/pzdr.tfm" 1136768653 1528 f853c4d1b4e0550255e02831fdc8496f ""
@@ -238,22 +238,18 @@
   "/usr/share/texmf/web2c/texmf.cnf" 1644012257 39432 7155514e09a3d69036fac785183a21c2 ""
   "/var/lib/texmf/web2c/xetex/xelatex.fmt" 1725527794 5134212 fe1fd52b8f273927525d3cabfb235687 ""
   "acmart.cls" 1726506990 119546 70d0ff49a7f114b7c5ddcef04ac4e869 ""
-  "comment.cut" 1726508738 64 0754424945249fbfae64d8991d811e64 "xelatex"
+  "comment.cut" 1726545909 64 0754424945249fbfae64d8991d811e64 "xelatex"
   "figures/netReplica.png" 1726506990 161046 72eb8f80ed402bd951c0498e8082c691 ""
-  "paper.aux" 1726508739 5445 4407c9e3e9a891eefc409ff732046a97 "xelatex"
-  "paper.bbl" 1726508736 4323 3347988a6aee0df0dbf7c6b71c8c3877 "bibtex paper"
-  "paper.out" 1726508739 5110 2854753d162f793f4cfce5e1f7c9156c "xelatex"
-  "paper.tex" 1726508690 5483 8a8d2db6890776d562c7dd2bd8dd9e2c ""
+  "paper.aux" 1726545911 4759 2cc35a740e20a41401f2588a0bf50a47 "xelatex"
+  "paper.bbl" 1726545908 4323 3347988a6aee0df0dbf7c6b71c8c3877 "bibtex paper"
+  "paper.out" 1726545911 4635 f0fd16b999725d3f902b5ce0448a3721 "xelatex"
+  "paper.tex" 1726535387 5394 00f6bdef3d25deb194e388d38dd88887 ""
   "sections//abstract.tex" 1726508534 69 cd435826d655dde2b9c1f5c05119e9e0 ""
   "sections//background.tex" 1726507191 274 ae22f6a96f1eccd0ced37ed02ec3c5e1 ""
-  "sections//conclusion.tex" 1726507191 43 5a28dd1d545db367d8ae62053cdf7948 ""
-  "sections//discussion.tex" 1726506990 228 4dfab27d4bec8d185361cde6fbdc04ec ""
-  "sections//evaluation.tex" 1726507779 0 d41d8cd98f00b204e9800998ecf8427e ""
   "sections//introduction.tex" 1726507950 5275 6795699d4d4550de73d4deea0e41fd8f ""
-  "sections//methodology.tex" 1726507191 9201 86c7692e58c38db7d10ee0f953d0bd95 ""
-  "sections//netReplica.tex" 1726506990 5392 42ed1b6f4b890d0e31fc7d258a76b64d ""
-  "sections//related.tex" 1726507191 4027 cbdb9b19571e670677deeeaff5296ce7 ""
-  "sections//study.tex" 1726507812 899 c7e7f5c5dcf5aa11ad3beaf08ce1861b ""
+  "sections//methodology.tex" 1726537164 9588 4a00bf4e87afaef0e4656ae436213d1b ""
+  "sections//netReplica.tex" 1726535421 5392 a2a250147107fd1609f6241efe932ea1 ""
+  "sections//related.tex" 1726545899 8083 065575f8ad4c29d6768bae5d65f06653 ""
   (generated)
   "comment.cut"
   "paper.aux"
